@@ -1,0 +1,32 @@
+{
+  "slug": "todo-cli-rust",
+  "title": "用 Rust 构建命令行待办事项应用",
+  "topic": "使用Rust构建一个命令行待办事项应用",
+  "created": "2026-06-13T00:00:00+08:00",
+  "status": "unverified",
+  "tags": ["rust", "cli", "command-line", "todo", "beginner"],
+  "parts": ["part-01.md"],
+  "pending_part": "",
+  "repo": "",
+  "repo_branch": "",
+  "tools": [
+    {"name": "rust", "version": "1.96.0"},
+    {"name": "clap", "version": "4"},
+    {"name": "serde", "version": "1.0"},
+    {"name": "serde_json", "version": "1.0"},
+    {"name": "chrono", "version": "0.4"},
+    {"name": "dirs", "version": "5"}
+  ],
+  "sources": [
+    "https://docs.rs/clap/latest/clap/_derive/index.html",
+    "https://serde.rs/",
+    "https://docs.rs/chrono/latest/chrono/",
+    "https://rust-cli.github.io/book/",
+    "https://docs.rs/dirs/latest/dirs/",
+    "https://docs.rs/serde_json/latest/serde_json/",
+    "https://cloud.tencent.com/developer/article/2611582",
+    "https://blog.csdn.net/github_28443763/article/details/159894935"
+  ],
+  "voice": "plainspoken",
+  "model": "QoderWork"
+}
