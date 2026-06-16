@@ -5,7 +5,7 @@
   "created": "2026-06-13T00:00:00+08:00",
   "status": "unverified",
   "tags": ["rust", "cli", "command-line", "todo", "beginner"],
-  "parts": ["part-01.md"],
+  "parts": ["part-01.md", "part-02.md"],
   "pending_part": "",
   "repo": "",
   "repo_branch": "",
@@ -15,7 +15,9 @@
     {"name": "serde", "version": "1.0"},
     {"name": "serde_json", "version": "1.0"},
     {"name": "chrono", "version": "0.4"},
-    {"name": "dirs", "version": "5"}
+    {"name": "dirs", "version": "5"},
+    {"name": "colored", "version": "2"},
+    {"name": "anyhow", "version": "1"}
   ],
   "sources": [
     "https://docs.rs/clap/latest/clap/_derive/index.html",
@@ -25,7 +27,12 @@
     "https://docs.rs/dirs/latest/dirs/",
     "https://docs.rs/serde_json/latest/serde_json/",
     "https://cloud.tencent.com/developer/article/2611582",
-    "https://blog.csdn.net/github_28443763/article/details/159894935"
+    "https://blog.csdn.net/github_28443763/article/details/159894935",
+    "https://docs.rs/anyhow/latest/anyhow/",
+    "https://docs.rs/thiserror/latest/thiserror/",
+    "https://docs.rs/colored/latest/colored/",
+    "https://serde.rs/field-attrs.html",
+    "https://doc.rust-lang.org/std/iter/trait.Iterator.html"
   ],
   "voice": "plainspoken",
   "model": "QoderWork"
