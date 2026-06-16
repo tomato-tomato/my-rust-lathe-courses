@@ -1,6 +1,6 @@
 # 使用Lathe工具学习Rust
 
-一个使用 [Lathe](https://github.com/devenjarvis/lathehttps://github.com/devenjarvis/lathe) 来学习Rust的个人仓库记录。本仓库包含将 Lathe 提炼成无 cli 版本的 skills、skills的使用说明、通过 kimi网页版规划的Rust学习路线、通过该skills生成的对应课程 以及 相关学习代码的记录。
+一个使用 [Lathe](https://github.com/devenjarvis/lathe) 来学习Rust的个人仓库记录。本仓库包含将 Lathe 提炼成无 cli 版本的 skills、skills的使用说明、通过 kimi网页版规划的Rust学习路线、通过该skills生成的对应课程 以及 相关学习代码的记录。
 
 本仓库中的 skills 通过 Qwen 3.7max 读取 Lathe 中的代码改写生成，可直接复制到QoderWork 的skills文件夹中，直接在 QoderWork 中使用。
 
