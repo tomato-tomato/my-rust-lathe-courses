@@ -322,6 +322,9 @@ fn load_todos() -> Result<Vec<Todo>> {
 }
 ```
 
+> [!HEADS-UP]
+> `Ok` 的 `k` 是**小写**的。Rust 的 `Result` 枚举有两个变体：`Ok(T)` 和 `Err(E)`——只有首字母大写。写成 `OK(todos)`（大写 K）会报 `cannot find function 'OK' in this scope`。这是一个非常常见的笔误，几乎每个 Rust 开发者都踩过。记住：`Ok`，不是 `OK`。
+
 三个关键变化。
 
 **返回类型从 `Vec<Todo>` 变为 `Result<Vec<Todo>>`。** `Result<T>` 是 anyhow 的类型别名，展开后是 `std::result::Result<T, anyhow::Error>`。函数现在明确告诉调用者："我可能会失败"。
