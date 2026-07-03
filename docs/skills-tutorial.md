@@ -1,8 +1,8 @@
-# Lathe 技能在QoderWork中的使用教程
+# Lathe 技能在 QoderWork 中的使用教程
 
 Lathe 是一套面向 LLM 编码助手的**动手实践型教程生成技能体系**。通过 6 个协同工作的技能（Skill），你可以按需生成高质量的技术教程，并逐步续写、验证、提问和管理。
 
-> 本教程适用于 QoderWork / Qoder Code 环境。技能以 SKILL.md 格式提供，兼容所有支持 Agent Skills 的 LLM 编码助手。
+> 本教程适用于 QoderWork（VSCode 插件）环境。技能以 SKILL.md 格式提供，兼容所有支持 Agent Skills 的 LLM 编码助手。
 
 ## 目录
 
@@ -23,23 +23,55 @@ Lathe 是一套面向 LLM 编码助手的**动手实践型教程生成技能体�
 
 ## 快速开始
 
-### 1. 安装技能
+### 1. 下载技能包
 
-将 `qoderwork-skills-nocli/` 目录下的 6 个技能文件夹复制到 QoderWork 的技能目录：
+从本仓库的 [GitHub Releases](../../releases) 页面下载最新的 `skills` 压缩包并解压：
 
 ```bash
-# 复制到用户级技能目录（所有项目可用）
-cp -r qoderwork-skills-nocli/* ~/.qoderwork/skills/
-
-# 或复制到项目级技能目录（仅当前项目可用）
-cp -r qoderwork-skills-nocli/* .qoderwork/skills/
+# 下载并解压（以实际 release 文件名为准）
+unzip skills.zip -d ./skills-download
 ```
 
-### 2. 验证安装
+解压后的目录结构如下：
 
-在 QoderWork 中输入 `/lathe`，如果技能正确加载，AI 会询问你的经验水平和教程主题。
+```
+skills-download/
+├── lathe/           ← 核心：生成教程
+│   └── SKILL.md
+├── lathe-extend/    ← 续写教程
+│   └── SKILL.md
+├── lathe-verify/    ← 验证教程
+│   └── SKILL.md
+├── lathe-ask/       ← 提问教程内容
+│   └── SKILL.md
+├── lathe-tag/       ← 管理教程标签
+│   └── SKILL.md
+└── lathe-voice/     ← 创建自定义语气
+    └── SKILL.md
+```
 
-### 3. 生成第一个教程
+### 2. 安装技能
+
+将解压后的技能文件夹复制到技能目录：
+
+```bash
+# 复制到用户级技能目录（所有项目可用，推荐）
+cp -r skills-download/* ~/.qoderwork/skills/
+
+# 或复制到项目级技能目录（仅当前项目可用）
+mkdir -p .qoderwork/skills
+cp -r skills-download/* .qoderwork/skills/
+```
+
+> **提示：** 用户级安装（`~/.qoderwork/skills/`）只需操作一次，之后在所有项目中都可使用这些技能。
+>
+> 如果你使用的是 Qoder 而非 QoderWork，请将技能复制到 `~/.qoder/skills/`（用户级）或 `.qoder/skills/`（项目级）。
+
+### 3. 验证安装
+
+在编码助手中输入 `/lathe`，如果技能正确加载，AI 会询问你的经验水平和教程主题。
+
+### 4. 生成第一个教程
 
 ```
 /lathe 用 Go 构建一个 Raft 共识算法实现
@@ -70,7 +102,7 @@ AI 会引导你完成：确认经验水平 → 锁定工具版本 → 研究主�
 
 ```json
 {
-  "tutorials_base_path": "~/others/lathe_tutorials"
+  "tutorials_base_path": "~/lathe_tutorials"
 }
 ```
 
@@ -78,7 +110,7 @@ AI 会引导你完成：确认经验水平 → 锁定工具版本 → 研究主�
 
 首次调用 `/lathe` 时，技能会检测配置文件是否存在：
 
-- **不存在：** 询问你是否使用默认路径 `~/others/lathe_tutorials/`，或指定新路径。确认后自动创建配置文件。
+- **不存在：** 询问你是否使用默认路径 `~/lathe_tutorials/`，或指定新路径。确认后自动创建配置文件。
 - **已存在：** 静默读取路径，直接使用。
 
 ### 修改存储路径
@@ -98,7 +130,7 @@ echo '{"tutorials_base_path": "~/my-tutorials"}' > ~/.lathe/config.json
 ### 默认目录结构
 
 ```
-~/others/lathe_tutorials/          ← 教程基础目录
+~/lathe_tutorials/                 ← 教程基础目录
 ├── <slug>/                        ← 每个教程一个子目录
 │   ├── metadata.json              ← 教程元数据
 │   ├── part-01.md                 ← 第一部分
@@ -150,7 +182,7 @@ echo '{"tutorials_base_path": "~/my-tutorials"}' > ~/.lathe/config.json
 AI 会询问：
 
 - 教程是否针对特定的代码仓库（提供 URL 和分支）
-- 需要锁定哪些工具/语言的版本（如 `Go 1.22`、`Zig 0.13.0`）
+- 需要锁定哪些工具/语言的版本（如 `Go 1.22`、`Rust 1.96.0`）
 
 你可以提议版本，AI 会确认：
 
@@ -167,7 +199,7 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 **7. 存储教程**
 将 `part-01.md` 和 `metadata.json` 写入教程目录，然后告知你：
 
-> **教程已保存**到 `~/others/lathe_tutorials/raft-go/`。
+> **教程已保存**到 `~/lathe_tutorials/raft-go/`。
 > 这是第一部分。要添加更多部分，调用 `/lathe-extend raft-go`。
 > 验证是可选的：调用 `/lathe-verify raft-go`。
 > 要对某个部分提问，调用 `/lathe-ask raft-go part-01.md`。
@@ -439,11 +471,11 @@ Voice 名称会记录在 `metadata.json` 中，`/lathe-extend` 会自动继承�
 ```
 用户：/lathe 用 Go 构建 Raft 共识算法
 
-AI：这是首次使用 Lathe。教程默认存储在 ~/others/lathe_tutorials/，要使用其他位置吗？
+AI：这是首次使用 Lathe。教程默认存储在 ~/lathe_tutorials/，要使用其他位置吗？
 
 用户：默认就好
 
-AI：已创建配置。教程将存储在 ~/others/lathe_tutorials/。
+AI：已创建配置。教程将存储在 ~/lathe_tutorials/。
     你在这个领域的经验水平如何——初学者、有一定了解、还是在相关领域有经验？
 
 用户：有一定了解
@@ -459,7 +491,7 @@ AI：我将基于 Go 1.22 来写——可以吗？这个教程是独立教程还
 AI：（研究主题中...查阅了 Raft 论文、Go 标准库文档等 6 个来源）
     （生成 part-01.md 和 metadata.json）
 
-    教程已保存到 ~/others/lathe_tutorials/raft-go/。
+    教程已保存到 ~/lathe_tutorials/raft-go/。
     要添加更多部分，调用 /lathe-extend raft-go。
 ```
 
@@ -508,7 +540,7 @@ AI：（进行风格访谈，起草 voice 规范）
 
 用户：很好
 
-AI：已保存到 ~/others/lathe_tutorials/voices/socratic.md。
+AI：已保存到 ~/lathe_tutorials/voices/socratic.md。
     下次生成教程时可以指定：/lathe <主题>，使用 socratic voice
 ```
 
@@ -540,7 +572,7 @@ AI：已保存到 ~/others/lathe_tutorials/voices/socratic.md。
     "https://pkg.go.dev/sync"
   ],
   "voice": "plainspoken",
-  "model": "DeepSeek V4"
+  "model": "QoderWork"
 }
 ```
 
@@ -565,7 +597,7 @@ AI：已保存到 ~/others/lathe_tutorials/voices/socratic.md。
 
 每个部分遵循统一结构：
 
-```markdown
+````markdown
 # [标题]
 
 [引子段落]
@@ -603,10 +635,7 @@ AI：已保存到 ~/others/lathe_tutorials/voices/socratic.md。
 ## 来源
 
 1. [标题](url) —— 说明
-   
-   ```
-   
-   ```
+````
 
 ### verify-result.json
 
@@ -642,7 +671,14 @@ AI：已保存到 ~/others/lathe_tutorials/voices/socratic.md。
 
 ### Q：可以在不同的 AI 工具之间切换使用吗？
 
-可以。技能文件（SKILL.md）是标准的 Markdown 格式，兼容 Claude Code、QoderWork、Qwen Code 等支持 Agent Skills 的工具。只要将技能文件安装到对应工具的技能目录即可。
+可以。技能文件（SKILL.md）是标准的 Markdown 格式，兼容 QoderWork、Qoder、Qwen Code 等支持 Agent Skills 的工具。只要将技能文件安装到对应工具的技能目录即可。
+
+各工具的技能目录参考：
+
+| 工具 | 用户级目录 | 项目级目录 |
+| --- | --- | --- |
+| QoderWork（VSCode 插件） | `~/.qoderwork/skills/` | `.qoderwork/skills/` |
+| Qoder | `~/.qoder/skills/` | `.qoder/skills/` |
 
 ### Q：验证失败了怎么办？
 
@@ -664,9 +700,9 @@ AI：已保存到 ~/others/lathe_tutorials/voices/socratic.md。
 
 ### Q：如何查看所有已生成的教程？
 
-浏览教程基础目录（默认为 `~/others/lathe_tutorials/`），每个子目录就是一个教程。也可以通过标签筛选：
+浏览教程基础目录（默认为 `~/lathe_tutorials/`），每个子目录就是一个教程。也可以通过标签筛选：
 
 ```bash
 # 查找包含特定标签的教程
-grep -rl '"compilers"' ~/others/lathe_tutorials/*/metadata.json
+grep -rl '"compilers"' ~/lathe_tutorials/*/metadata.json
 ```
