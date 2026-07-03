@@ -25,7 +25,7 @@ Lathe 是一套面向 LLM 编码助手的**动手实践型教程生成技能体�
 
 ### 1. 下载技能包
 
-从本仓库的 [GitHub Releases](../../releases) 页面下载最新的 `skills` 压缩包并解压：
+从本仓库的 [GitHub Releases] 页面下载最新的 `skills` 压缩包并解压：
 
 ```bash
 # 下载并解压（以实际 release 文件名为准）
