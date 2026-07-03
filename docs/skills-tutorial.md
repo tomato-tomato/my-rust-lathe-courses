@@ -2,7 +2,7 @@
 
 Lathe 是一套面向 LLM 编码助手的**动手实践型教程生成技能体系**。通过 6 个协同工作的技能（Skill），你可以按需生成高质量的技术教程，并逐步续写、验证、提问和管理。
 
-> 本教程适用于 QoderWork（VSCode 插件）环境。技能以 SKILL.md 格式提供，兼容所有支持 Agent Skills 的 LLM 编码助手。
+> 本教程适用于 **QoderWork** 或 **QoderWork CN** 桌面客户端。本仓库中的技能当前仅在这两款客户端中使用过，其他场景需要注意验证
 
 ## 目录
 
@@ -65,11 +65,11 @@ cp -r skills-download/* .qoderwork/skills/
 
 > **提示：** 用户级安装（`~/.qoderwork/skills/`）只需操作一次，之后在所有项目中都可使用这些技能。
 >
-> 如果你使用的是 Qoder 而非 QoderWork，请将技能复制到 `~/.qoder/skills/`（用户级）或 `.qoder/skills/`（项目级）。
+> 本仓库中的技能仅在 QoderWork 和 QoderWork CN 客户端上经过测试
 
 ### 3. 验证安装
 
-在编码助手中输入 `/lathe`，如果技能正确加载，AI 会询问你的经验水平和教程主题。
+在 QoderWork 或 QoderWork CN 客户端中输入 `/lathe`，如果技能正确加载，AI 会询问你的经验水平和教程主题。
 
 ### 4. 生成第一个教程
 
@@ -671,14 +671,13 @@ AI：已保存到 ~/lathe_tutorials/voices/socratic.md。
 
 ### Q：可以在不同的 AI 工具之间切换使用吗？
 
-可以。技能文件（SKILL.md）是标准的 Markdown 格式，兼容 QoderWork、Qoder、Qwen Code 等支持 Agent Skills 的工具。只要将技能文件安装到对应工具的技能目录即可。
+技能文件（SKILL.md）虽然是标准的 Markdown 格式，但本仓库中的技能**专为 QoderWork 和 QoderWork CN 客户端设计和测试**。在其他工具（如 Qoder、Qwen Code 等）中可能无法正常工作，不推荐使用。
 
-各工具的技能目录参考：
+技能目录参考：
 
-| 工具 | 用户级目录 | 项目级目录 |
+| 客户端 | 用户级目录 | 项目级目录 |
 | --- | --- | --- |
-| QoderWork（VSCode 插件） | `~/.qoderwork/skills/` | `.qoderwork/skills/` |
-| Qoder | `~/.qoder/skills/` | `.qoder/skills/` |
+| QoderWork / QoderWork CN | `~/.qoderwork/skills/` | `.qoderwork/skills/` |
 
 ### Q：验证失败了怎么办？
 
