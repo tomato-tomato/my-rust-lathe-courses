@@ -63,6 +63,7 @@
 **可用 voice：**
 - **plainspoken**（默认）—— 见 SKILL.md"内置 voice"。
 - **companion** —— 见 SKILL.md"内置 voice"。
+- **craftsman** —— 见 SKILL.md"内置 voice"。
 - **自定义 voice** —— 通过"创建语气"操作创建。读取 `<TUTORIALS_DIR>/voices/<名称>.md` 获取规范。
 
 如果读者指定了 voice，使用它。否则使用 `plainspoken`。在 `metadata.json` 中记录 voice 名称。
