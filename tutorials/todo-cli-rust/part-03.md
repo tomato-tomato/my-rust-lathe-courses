@@ -138,6 +138,32 @@ if let Some(time) = todo.completed_at {
 > [!DESIGN-NOTE]
 > **什么时候用 `match`，什么时候用 `if let`？** 一个实用的判断标准：如果你需要对每个变体做不同的事（`Some` 显示时间，`None` 显示"未完成"），用 `match`——它让所有情况的处理方式一目了然。如果你只关心一种情况（"有值就打印，没值就跳过"），用 `if let`——它省掉了空分支的噪音。
 
+### if let 也能用于 Result
+
+`if let` 不限于 `Option`——它能匹配**任何**枚举变体。前面 §"为什么需要 Option" 的 ASIDE 已经讲过 `Option` 和 `Result` 的平行关系：`Option` 有 `Some`/`None`，`Result` 有 `Ok`/`Err`。所以 `if let` 对 `Result` 的用法完全一样：
+
+```rust
+// 用 match 处理 Result（两个分支都有逻辑）
+match load_todos() {
+    Ok(todos) => println!("loaded {} todos", todos.len()),
+    Err(e) => eprintln!("failed: {}", e),
+}
+
+// 用 if let 只关心 Ok（忽略错误——慎用！）
+if let Ok(todos) = load_todos() {
+    println!("loaded {} todos", todos.len());
+}
+
+// 用 if let 只关心 Err（"失败了就警告，但不崩溃"）
+if let Err(e) = save_todos(&todos) {
+    eprintln!("Warning: failed to save — {}", e);
+}
+```
+
+最后一个例子非常实用。在 `tasky` 的 `main` 函数中，你用 `save_todos(&todos)?` 把错误直接传播出去让程序退出。但如果你希望"保存失败时打印警告、程序继续运行"，`if let Err` 比 `match` 更简洁——它只有一个分支有实际逻辑，不需要写 `_ => ()` 的空分支。
+
+和 `Option` 的选择标准一样：两个变体都需要处理时用 `match`，只关心一个时用 `if let`。区别在于 `Result` 的场景里，"忽略 `Err`"通常不是好主意（错误应该被处理），所以你会看到 `Result` 更多用 `match` 或 `?`。`if let` 在 `Result` 上最典型的用法就是 `if let Err`——"只关心错误"。
+
 ### Option 的常用方法
 
 除了 `match` 和 `if let`，`Option<T>` 还提供了很多方法避免冗长的模式匹配。你在 part 1 中已经见过 `.unwrap_or(0)`（`cmd_add` 计算新 ID 时），这里再介绍几个最常用的：
@@ -749,11 +775,13 @@ predicates = "3"
 ```rust
 use assert_cmd::Command;
 use predicates::prelude::*;
-use std::fs;
+use tempfile::TempDir;
 
-fn setup_test_home() -> tempfile::TempDir {
+fn setup_test_home() -> TempDir {
     let tmp = tempfile::tempdir().unwrap();
-    std::env::set_var("HOME", tmp.path());
+    unsafe {
+        std::env::set_var("HOME", tmp.path());
+    }
     tmp
 }
 ```
@@ -768,6 +796,9 @@ tempfile = "3"
 ```
 
 `tempfile::tempdir()` 创建一个临时目录，测试结束后自动删除。`set_var("HOME", ...)` 把 `HOME` 环境变量指向临时目录，这样 `dirs::config_dir()` 会在临时目录里创建 `tasky/todos.json`——你的测试不会影响真实的待办数据。
+
+> [!HEADS-UP]
+> **为什么 `set_var` 需要 `unsafe`？** 从 Rust edition 2024 开始，`std::env::set_var` 被标记为 `unsafe fn`——因为修改环境变量**不是线程安全的**（多个线程同时读写环境变量可能导致未定义行为）。在 edition 2021 中这个函数不需要 `unsafe`，但你的 `Cargo.toml` 中 `edition = "2024"`，所以必须用 `unsafe {}` 块包裹调用。`unsafe` 块的含义是"我（程序员）保证这段代码在当前上下文中是安全的"——在测试里串行运行时，这个保证是成立的。
 
 > [!HEADS-UP]
 > `set_var` 修改的是**当前进程**的环境变量。`cargo test` 默认并行运行测试，多个测试同时修改 `HOME` 会互相干扰。解决方法有两种：一是用 `cargo test -- --test-threads=1` 串行运行，二是在每个测试中使用不同的环境变量（比如设置 `TASKY_DATA_DIR` 并在代码中读取）。对于入门级测试，`--test-threads=1` 是最简单的方案。
@@ -888,6 +919,27 @@ tasky list
 ```
 
 想确认安装位置？运行 `which tasky`（macOS/Linux）或 `where tasky`（Windows），应该输出类似 `/Users/你的名字/.cargo/bin/tasky` 的路径。
+
+### 卸载你的工具
+
+`tasky` 是学习项目，学完之后你可能想把它从系统中移除。卸载分两步：
+
+```bash
+# 第一步：删除二进制文件
+cargo uninstall tasky
+```
+
+`cargo uninstall` 会删除 `~/.cargo/bin/tasky`，之后 `tasky` 命令不再可用。
+
+```bash
+# 第二步（可选）：删除数据文件
+rm -rf ~/Library/Application\ Support/tasky
+```
+
+这一步删除 `tasky` 存储的 `todos.json` 数据文件——也就是你用 `tasky add` 添加的那些待办事项。如果你将来想重新安装并保留旧数据，可以跳过这步。
+
+> [!ASIDE]
+> **`cargo install` vs 包管理器。** 你大概注意到了，`cargo install` 没有提供 `cargo list`（列出已安装的 crate）或批量卸载功能。如果你安装了多个工具想统一管理，可以查看 `~/.cargo/bin/` 目录下的所有文件，或者使用社区工具 [`cargo-binstall`](https://github.com/cargo-bins/cargo-binstall) 来管理预编译的二进制安装。对于 `tasky` 这样的单个工具，`cargo uninstall` 足够了。
 
 ### 发布到 crates.io
 
