@@ -67,6 +67,11 @@
 
 如果读者指定了 voice，使用它。否则使用 `plainspoken`。在 `metadata.json` 中记录 voice 名称。
 
+**风格标杆侧重：** voice 控制语气，**风格标杆控制写作节奏和结构选择**。在开始写作前，查阅 SKILL.md"风格标杆"的场景侧重表，根据教程主题匹配主锚点作者，侧重参考其长项来指导：
+- 章节如何组织（Nystrom 式独立成篇 vs Ciechanowski 式逐层拆解）
+- 代码演示的节奏（Amit Patel 式渐进可运行 vs Sam Who 式精炼配可视化）
+- 与读者的距离（Julia Evans 式亲切聊天 vs plainspoken 式精确陈述）
+
 **优先级绝对——SKILL.md 中的不变量获胜。** voice 仅控制语气；绝不放松准确性、研究、引用或验证规则。
 
 ## 内容与教学法（始终生效）
