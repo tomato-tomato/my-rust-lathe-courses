@@ -5,7 +5,7 @@ description: 按需生成、续写、验证、提问动手实践型技术教程�
 
 # Lathe — 教程体系
 
-Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续写、验证、提问、标签和语气六大功能。标杆是 Robert Nystrom（Crafting Interpreters）、Sam Who、Julia Evans、Bartosz Ciechanowski 的写作水平。
+Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续写、验证、提问、标签和语气六大功能。标杆是 Robert Nystrom（Crafting Interpreters）、Sam Who、Julia Evans、Bartosz Ciechanowski、Amit Patel（Red Blob Games）的写作水平。
 
 ## 使用方式
 
