@@ -1,16 +1,10 @@
----
-name: lathe-ask
-description: 在会话中回答读者关于 Lathe 教程特定部分的问题。当用户调用 /lathe-ask 并附带 slug 和部分名时使用，如 "/lathe-ask digital-synth-zig part-02.md"，下一行跟上问题。
----
+# 提问教程内容
 
-# Lathe — 提问教程内容
+回答读者关于已存储教程某个部分的问题，回答要扎根于该教程实际构建的内容。
 
-回答读者关于已存储教程某个部分的问题，回答要扎根于该教程实际构建的内容。触发方式：
-
-> **路径解析：** 本技能中所有 `<TUTORIALS_DIR>` 均从 `~/.lathe/config.json` 的 `tutorials_base_path` 字段读取。如果配置文件不存在，使用默认值 `~/others/lathe_tutorials`。
-
+**触发格式：**
 ```
-/lathe-ask <slug> <part-NN.md>
+/lathe 提问 <slug> <part-NN.md>
 <读者的问题>
 ```
 
@@ -30,6 +24,6 @@ description: 在会话中回答读者关于 Lathe 教程特定部分的问题。
 
 ## 边界——只读、对话式
 
-- **本技能不写入任何内容。** 它是纯粹的对话模式。
+- **本操作不写入任何内容。** 它是纯粹的对话模式。
 - **不修改状态：** 不要碰 `metadata.json`、`verify-result.json` 或部分 markdown。不要验证、不要续写、不要打标签。
 - 保持回答针对本教程的具体产物，使用其 voice。

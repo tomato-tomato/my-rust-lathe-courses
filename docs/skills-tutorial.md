@@ -1,20 +1,20 @@
 # Lathe 技能在 QoderWork 中的使用教程
 
-Lathe 是一套面向 LLM 编码助手的**动手实践型教程生成技能体系**。通过 6 个协同工作的技能（Skill），你可以按需生成高质量的技术教程，并逐步续写、验证、提问和管理。
+Lathe 是一套面向 LLM 编码助手的**动手实践型教程生成技能体系**。通过一个统一的 `/lathe` 命令，你可以按需生成高质量的技术教程，并逐步续写、验证、提问和管理。
 
 > 本教程适用于 **QoderWork** 或 **QoderWork CN** 桌面客户端。本仓库中的技能当前仅在这两款客户端中使用过，其他场景需要注意验证
 
 ## 目录
 
 - [快速开始](#快速开始)
-- [技能一览](#技能一览)
+- [操作一览](#操作一览)
 - [存储路径配置](#存储路径配置)
 - [/lathe — 生成教程](#lathe--生成教程)
-- [/lathe-extend — 续写教程](#lathe-extend--续写教程)
-- [/lathe-verify — 验证教程](#lathe-verify--验证教程)
-- [/lathe-ask — 提问教程内容](#lathe-ask--提问教程内容)
-- [/lathe-tag — 管理教程标签](#lathe-tag--管理教程标签)
-- [/lathe-voice — 创建自定义语气](#lathe-voice--创建自定义语气)
+- [/lathe 续写 — 续写教程](#lathe-续写--续写教程)
+- [/lathe 验证 — 验证教程](#lathe-验证--验证教程)
+- [/lathe 提问 — 提问教程内容](#lathe-提问--提问教程内容)
+- [/lathe 标签 — 管理教程标签](#lathe-标签--管理教程标签)
+- [/lathe 语气 — 创建自定义语气](#lathe-语气--创建自定义语气)
 - [完整工作流示例](#完整工作流示例)
 - [教程文件结构参考](#教程文件结构参考)
 - [常见问题](#常见问题)
@@ -36,18 +36,14 @@ unzip skills.zip -d ./skills-download
 
 ```
 skills-download/
-├── lathe/           ← 核心：生成教程
-│   └── SKILL.md
-├── lathe-extend/    ← 续写教程
-│   └── SKILL.md
-├── lathe-verify/    ← 验证教程
-│   └── SKILL.md
-├── lathe-ask/       ← 提问教程内容
-│   └── SKILL.md
-├── lathe-tag/       ← 管理教程标签
-│   └── SKILL.md
-└── lathe-voice/     ← 创建自定义语气
-    └── SKILL.md
+└── lathe/               ← 统一技能文件夹
+    ├── SKILL.md          ← 入口路由 + 共享配置
+    ├── generate.md       ← 生成教程模块
+    ├── extend.md         ← 续写教程模块
+    ├── verify.md         ← 验证教程模块
+    ├── ask.md            ← 提问模块
+    ├── tag.md            ← 标签模块
+    └── voice.md          ← 语气模块
 ```
 
 ### 2. 安装技能
@@ -69,7 +65,7 @@ cp -r skills-download/* .qoderwork/skills/
 
 ### 3. 验证安装
 
-在 QoderWork 或 QoderWork CN 客户端中输入 `/lathe`，如果技能正确加载，AI 会询问你的经验水平和教程主题。
+在 QoderWork 或 QoderWork CN 客户端中输入 `/lathe`，如果技能正确加载，AI 会展示操作选项供你选择。
 
 ### 4. 生成第一个教程
 
@@ -81,16 +77,20 @@ AI 会引导你完成：确认经验水平 → 锁定工具版本 → 研究主�
 
 ---
 
-## 技能一览
+## 操作一览
 
-| 技能               | 命令                               | 功能           | 写入文件                            |
-| ---------------- | -------------------------------- | ------------ | ------------------------------- |
-| **lathe**        | `/lathe <主题>`                    | 生成教程的第一部分    | `part-01.md`、`metadata.json`    |
-| **lathe-extend** | `/lathe-extend <slug> [指导]`      | 为已有教程添加下一部分  | `part-NN.md`、更新 `metadata.json` |
-| **lathe-verify** | `/lathe-verify <slug>`           | 端到端验证教程是否可用  | `verify-result.json`            |
-| **lathe-ask**    | `/lathe-ask <slug> <part-NN.md>` | 回答关于教程某部分的问题 | 无（只读）                           |
-| **lathe-tag**    | `/lathe-tag <slug>`              | 管理教程的搜索标签    | 更新 `metadata.json`              |
-| **lathe-voice**  | `/lathe-voice [名称]`              | 创建自定义写作语气预设  | `voices/<名称>.md`                |
+所有操作通过 `/lathe` 调用，后跟**意图关键词**和参数：
+
+| 操作 | 命令 | 功能 | 写入文件 |
+|------|------|------|----------|
+| **生成教程** | `/lathe <主题>` | 生成教程的第一部分 | `part-01.md`、`metadata.json` |
+| **续写教程** | `/lathe 续写 <slug> [指导]` | 为已有教程添加下一部分 | `part-NN.md`、更新 `metadata.json` |
+| **验证教程** | `/lathe 验证 <slug>` | 端到端验证教程是否可用 | `verify-result.json` |
+| **提问内容** | `/lathe 提问 <slug> <part> <问题>` | 回答关于教程某部分的问题 | 无（只读） |
+| **管理标签** | `/lathe 标签 <slug>` | 管理教程的搜索标签 | 更新 `metadata.json` |
+| **创建语气** | `/lathe 语气 [名称]` | 创建自定义写作语气预设 | `voices/<名称>.md` |
+
+> **提示：** 也支持纯自然语言触发（无需 `/lathe`），AI 会自动识别意图。当意图不明确时，AI 会展示选项菜单供你选择。
 
 ---
 
@@ -102,7 +102,7 @@ AI 会引导你完成：确认经验水平 → 锁定工具版本 → 研究主�
 
 ```json
 {
-  "tutorials_base_path": "~/lathe_tutorials"
+  "tutorials_base_path": "~/others/lathe_tutorials"
 }
 ```
 
@@ -110,7 +110,7 @@ AI 会引导你完成：确认经验水平 → 锁定工具版本 → 研究主�
 
 首次调用 `/lathe` 时，技能会检测配置文件是否存在：
 
-- **不存在：** 询问你是否使用默认路径 `~/lathe_tutorials/`，或指定新路径。确认后自动创建配置文件。
+- **不存在：** 询问你是否使用默认路径 `~/others/lathe_tutorials/`，或指定新路径。确认后自动创建配置文件。
 - **已存在：** 静默读取路径，直接使用。
 
 ### 修改存储路径
@@ -130,12 +130,12 @@ echo '{"tutorials_base_path": "~/my-tutorials"}' > ~/.lathe/config.json
 ### 默认目录结构
 
 ```
-~/lathe_tutorials/                 ← 教程基础目录
+~/others/lathe_tutorials/          ← 教程基础目录
 ├── <slug>/                        ← 每个教程一个子目录
 │   ├── metadata.json              ← 教程元数据
 │   ├── part-01.md                 ← 第一部分
-│   ├── part-02.md                 ← 第二部分（由 /lathe-extend 添加）
-│   └── verify-result.json         ← 验证结果（由 /lathe-verify 生成）
+│   ├── part-02.md                 ← 第二部分（由 /lathe 续写 添加）
+│   └── verify-result.json         ← 验证结果（由 /lathe 验证 生成）
 └── voices/                        ← 自定义语气预设
     └── <名称>.md                  ← voice 规范文件
 ```
@@ -199,10 +199,10 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 **7. 存储教程**
 将 `part-01.md` 和 `metadata.json` 写入教程目录，然后告知你：
 
-> **教程已保存**到 `~/lathe_tutorials/raft-go/`。
-> 这是第一部分。要添加更多部分，调用 `/lathe-extend raft-go`。
-> 验证是可选的：调用 `/lathe-verify raft-go`。
-> 要对某个部分提问，调用 `/lathe-ask raft-go part-01.md`。
+> **教程已保存**到 `~/others/lathe_tutorials/raft-go/`。
+> 这是第一部分。要添加更多部分，调用 `/lathe 续写 raft-go`。
+> 验证是可选的：调用 `/lathe 验证 raft-go`。
+> 要对某个部分提问，调用 `/lathe 提问 raft-go part-01.md`。
 
 ### 教程质量标准
 
@@ -216,7 +216,7 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 
 ---
 
-## /lathe-extend — 续写教程
+## /lathe 续写 — 续写教程
 
 ### 功能
 
@@ -225,15 +225,15 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 ### 调用方式
 
 ```
-/lathe-extend <slug> [指导...]
+/lathe 续写 <slug> [指导...]
 ```
 
 **示例：**
 
 ```
-/lathe-extend raft-go
-/lathe-extend raft-go 这一部分实现日志复制
-/lathe-extend digital-synth-zig 添加低通滤波器
+/lathe 续写 raft-go
+/lathe 续写 raft-go 这一部分实现日志复制
+/lathe 续写 digital-synth-zig 添加低通滤波器
 ```
 
 如果不提供指导，AI 会根据上一部分末尾的"接下来"方向自动延续。
@@ -256,7 +256,7 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 
 ---
 
-## /lathe-verify — 验证教程
+## /lathe 验证 — 验证教程
 
 ### 功能
 
@@ -265,13 +265,13 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 ### 调用方式
 
 ```
-/lathe-verify <slug>
+/lathe 验证 <slug>
 ```
 
 **示例：**
 
 ```
-/lathe-verify raft-go
+/lathe 验证 raft-go
 ```
 
 ### 工作流程
@@ -292,27 +292,6 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 | `skipped`  | 跳过   | 缺少必需工具（如未安装 Zig 编译器） |
 | `failed`   | 验证失败 | 代码无法编译、输出不匹配、步骤矛盾    |
 
-**验证通过示例：**
-
-```json
-{
-  "status": "verified",
-  "checked_at": "2025-01-15T10:30:00Z"
-}
-```
-
-**验证失败示例：**
-
-```json
-{
-  "status": "failed",
-  "part": "part-02.md",
-  "failed_step": 2,
-  "error": "编译错误：未定义的变量 `filter_cutoff`",
-  "checked_at": "2025-01-15T10:30:00Z"
-}
-```
-
 ### 注意事项
 
 - 验证是**只读操作**，不会修改教程的任何部分文件
@@ -321,7 +300,7 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 
 ---
 
-## /lathe-ask — 提问教程内容
+## /lathe 提问 — 提问教程内容
 
 ### 功能
 
@@ -330,17 +309,17 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 ### 调用方式
 
 ```
-/lathe-ask <slug> <part-NN.md>
+/lathe 提问 <slug> <part-NN.md>
 <你的问题>
 ```
 
 **示例：**
 
 ```
-/lathe-ask raft-go part-01.md
+/lathe 提问 raft-go part-01.md
 为什么用环形缓冲区而不是 channel？
 
-/lathe-ask digital-synth-zig part-02.md
+/lathe 提问 digital-synth-zig part-02.md
 如果滤波器截止频率超过奈奎斯特频率会怎样？
 ```
 
@@ -351,14 +330,9 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 - **对缺口诚实** — 如果问题暴露了教程的错误或含糊之处，会直接说明
 - **对话式** — 保持会话以回答后续追问
 
-### 注意事项
-
-- 纯粹的只读操作，不修改任何文件
-- 不会触发验证、续写或打标签
-
 ---
 
-## /lathe-tag — 管理教程标签
+## /lathe 标签 — 管理教程标签
 
 ### 功能
 
@@ -367,13 +341,13 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 ### 调用方式
 
 ```
-/lathe-tag <slug>
+/lathe 标签 <slug>
 ```
 
 **示例：**
 
 ```
-/lathe-tag raft-go
+/lathe 标签 raft-go
 ```
 
 ### 标签规范
@@ -398,7 +372,7 @@ AI 会选择 2-5 个小写、可复用的标签，涵盖以下维度：
 
 ---
 
-## /lathe-voice — 创建自定义语气
+## /lathe 语气 — 创建自定义语气
 
 ### 功能
 
@@ -414,14 +388,14 @@ AI 会选择 2-5 个小写、可复用的标签，涵盖以下维度：
 ### 调用方式
 
 ```
-/lathe-voice [名称]
+/lathe 语气 [名称]
 ```
 
 **示例：**
 
 ```
-/lathe-voice terse
-/lathe-voice field-notes
+/lathe 语气 terse
+/lathe 语气 field-notes
 ```
 
 ### 创建流程
@@ -444,7 +418,7 @@ AI 会选择 2-5 个小写、可复用的标签，涵盖以下维度：
 /lathe 用 Rust 构建解析器，使用 terse voice
 ```
 
-Voice 名称会记录在 `metadata.json` 中，`/lathe-extend` 会自动继承。
+Voice 名称会记录在 `metadata.json` 中，`/lathe 续写` 会自动继承。
 
 ### 管理 Voice
 
@@ -464,18 +438,18 @@ Voice 名称会记录在 `metadata.json` 中，`/lathe-extend` 会自动继承�
 
 ## 完整工作流示例
 
-以下是一个从零开始、完整使用所有技能的示例流程：
+以下是一个从零开始、完整使用所有操作的示例流程：
 
 ### 第一步：配置存储路径（首次使用）
 
 ```
 用户：/lathe 用 Go 构建 Raft 共识算法
 
-AI：这是首次使用 Lathe。教程默认存储在 ~/lathe_tutorials/，要使用其他位置吗？
+AI：这是首次使用 Lathe。教程默认存储在 ~/others/lathe_tutorials/，要使用其他位置吗？
 
 用户：默认就好
 
-AI：已创建配置。教程将存储在 ~/lathe_tutorials/。
+AI：已创建配置。教程将存储在 ~/others/lathe_tutorials/。
     你在这个领域的经验水平如何——初学者、有一定了解、还是在相关领域有经验？
 
 用户：有一定了解
@@ -491,23 +465,23 @@ AI：我将基于 Go 1.22 来写——可以吗？这个教程是独立教程还
 AI：（研究主题中...查阅了 Raft 论文、Go 标准库文档等 6 个来源）
     （生成 part-01.md 和 metadata.json）
 
-    教程已保存到 ~/lathe_tutorials/raft-go/。
-    要添加更多部分，调用 /lathe-extend raft-go。
+    教程已保存到 ~/others/lathe_tutorials/raft-go/。
+    要添加更多部分，调用 /lathe 续写 raft-go。
 ```
 
 ### 第三步：续写更多部分
 
 ```
-用户：/lathe-extend raft-go 这一部分实现 Leader 选举
+用户：/lathe 续写 raft-go 这一部分实现 Leader 选举
 
 AI：（阅读已有教程，研究 Leader 选举，生成 part-02.md）
-    已添加 part-02.md。可以调用 /lathe-verify raft-go 验证。
+    已添加 part-02.md。可以调用 /lathe 验证 raft-go 验证。
 ```
 
 ### 第四步：验证教程
 
 ```
-用户：/lathe-verify raft-go
+用户：/lathe 验证 raft-go
 
 AI：（在临时目录中逐步执行，运行检查点命令）
     验证结果：
@@ -519,13 +493,13 @@ AI：（在临时目录中逐步执行，运行检查点命令）
 ### 第五步：提问和打标签
 
 ```
-用户：/lathe-ask raft-go part-02.md
+用户：/lathe 提问 raft-go part-02.md
      为什么选举超时要随机化？
 
 AI：在 part-02.md 的 "选举超时" 章节中，随机化是为了防止
     两个候选者同时发起选举导致的活锁...
 
-用户：/lathe-tag raft-go
+用户：/lathe 标签 raft-go
 
 AI：已为教程设置标签：["go", "distributed-systems", "consensus", "raft"]
 ```
@@ -533,14 +507,14 @@ AI：已为教程设置标签：["go", "distributed-systems", "consensus", "raft
 ### 第六步（可选）：创建自定义语气
 
 ```
-用户：/lathe-voice socratic
+用户：/lathe 语气 socratic
 
 AI：（进行风格访谈，起草 voice 规范）
     这是 socratic voice 的草稿...是否满意？
 
 用户：很好
 
-AI：已保存到 ~/lathe_tutorials/voices/socratic.md。
+AI：已保存到 ~/others/lathe_tutorials/voices/socratic.md。
     下次生成教程时可以指定：/lathe <主题>，使用 socratic voice
 ```
 
@@ -585,7 +559,7 @@ AI：已保存到 ~/lathe_tutorials/voices/socratic.md。
 | `topic`   | 用户的原始主题描述                               |
 | `created` | 创建时间（ISO 8601）                          |
 | `status`  | 状态：`unverified` / `verified` / `failed` |
-| `tags`    | 标签数组（由 `/lathe-tag` 管理）                 |
+| `tags`    | 标签数组（由 `/lathe 标签` 管理）                |
 | `parts`   | 已有的部分文件列表                               |
 | `repo`    | 关联的代码仓库 URL（独立教程为空）                     |
 | `tools`   | 锁定的工具链及版本                               |
@@ -667,7 +641,7 @@ AI：已保存到 ~/lathe_tutorials/voices/socratic.md。
 
 ### Q：教程可以跨多个会话续写吗？
 
-可以。每次调用 `/lathe-extend` 时，AI 会从 `metadata.json` 和已有部分文件中读取完整上下文，因此即使换了会话甚至换了 AI 模型，也能无缝续写。
+可以。每次调用 `/lathe 续写` 时，AI 会从 `metadata.json` 和已有部分文件中读取完整上下文，因此即使换了会话甚至换了 AI 模型，也能无缝续写。
 
 ### Q：可以在不同的 AI 工具之间切换使用吗？
 
@@ -687,11 +661,11 @@ AI：已保存到 ~/lathe_tutorials/voices/socratic.md。
 - 检查点命令的预期输出与实际不符
 - 前置条件遗漏了某个工具
 
-修复教程后重新运行 `/lathe-verify`。
+修复教程后重新运行 `/lathe 验证`。
 
 ### Q：如何修改已生成教程的内容？
 
-直接在编辑器中修改 `part-NN.md` 文件即可。修改后建议重新运行 `/lathe-verify` 确认可用性。
+直接在编辑器中修改 `part-NN.md` 文件即可。修改后建议重新运行 `/lathe 验证` 确认可用性。
 
 ### Q：Voice 会影响教程的准确性吗？
 
@@ -699,9 +673,13 @@ AI：已保存到 ~/lathe_tutorials/voices/socratic.md。
 
 ### Q：如何查看所有已生成的教程？
 
-浏览教程基础目录（默认为 `~/lathe_tutorials/`），每个子目录就是一个教程。也可以通过标签筛选：
+浏览教程基础目录（默认为 `~/others/lathe_tutorials/`），每个子目录就是一个教程。也可以通过标签筛选：
 
 ```bash
 # 查找包含特定标签的教程
-grep -rl '"compilers"' ~/lathe_tutorials/*/metadata.json
+grep -rl '"compilers"' ~/others/lathe_tutorials/*/metadata.json
 ```
+
+### Q：意图不明确时会发生什么？
+
+当你只输入 `/lathe` 或输入含糊的内容时，AI 不会默认生成教程，而是展示一个操作选项菜单（生成、续写、验证、提问、标签、语气），让你选择想要执行的操作。

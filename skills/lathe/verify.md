@@ -1,15 +1,8 @@
----
-name: lathe-verify
-description: 在会话中通过在全新的临时目录中端到端执行来验证已存储的 Lathe 教程是否确实可用。当用户调用 /lathe-verify 并附带 slug 时使用，如 "/lathe-verify digital-synth-zig"。
----
+# 验证教程
 
-# Lathe — 验证教程
+像读者一样在一个临时目录中按照已存储的教程逐步执行，并记录它是否确实可用。
 
-像读者一样在一个临时目录中按照已存储的教程逐步执行，并记录它是否确实可用。由 `/lathe-verify <slug>` 触发。
-
-本技能**对教程内容是只读的**：绝不编辑部分。唯一的写入是更新 `verify-result.json`。
-
-> **路径解析：** 本技能中所有 `<TUTORIALS_DIR>` 均从 `~/.lathe/config.json` 的 `tutorials_base_path` 字段读取。如果配置文件不存在，使用默认值 `~/others/lathe_tutorials`。
+本操作**对教程内容是只读的**：绝不编辑部分。唯一的写入是更新 `verify-result.json`。
 
 ## 协议
 

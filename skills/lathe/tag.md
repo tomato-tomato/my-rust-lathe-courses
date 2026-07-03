@@ -1,13 +1,6 @@
----
-name: lathe-tag
-description: 在会话中为已存储的 Lathe 教程选择或补充搜索标签。当用户调用 /lathe-tag 并附带 slug 时使用，如 "/lathe-tag digital-synth-zig"，用于选择适合搜索和标签筛选的标签，或为没有标签的教程补充标签。
----
+# 管理教程标签
 
-# Lathe — 教程标签管理
-
-选择使已存储教程可被发现的标签。由 `/lathe-tag <slug>` 触发。
-
-> **路径解析：** 本技能中所有 `<TUTORIALS_DIR>` 均从 `~/.lathe/config.json` 的 `tutorials_base_path` 字段读取。如果配置文件不存在，使用默认值 `~/others/lathe_tutorials`。
+选择使已存储教程可被发现的标签。
 
 ## 协议
 

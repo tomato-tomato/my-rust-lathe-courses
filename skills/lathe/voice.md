@@ -1,26 +1,14 @@
----
-name: lathe-voice
-description: 在会话中为 Lathe 教程创建自定义写作语气，然后通过写入 voice 文件持久化。当用户调用 /lathe-voice 时使用（可选附带名称，如 "/lathe-voice terse"），创建供 /lathe 生成教程时使用的语气/风格预设。
----
+# 创建 Voice（语气）
 
-# Lathe — 创建 Voice（语气）
+帮助用户制作**自定义写作语气**——一种语气/风格预设，供生成和续写教程时使用——然后将其持久化为文件。
 
-帮助用户制作**自定义写作语气** —— 一种语气/风格预设，供
-`/lathe` 和 `/lathe-extend` 生成教程时使用 —— 然后将其持久化为文件。
-由 `/lathe-voice [名称]` 触发。
-
-> **路径解析：** 本技能中所有 `<TUTORIALS_DIR>` 均从 `~/.lathe/config.json` 的 `tutorials_base_path` 字段读取。如果配置文件不存在，使用默认值 `~/others/lathe_tutorials`。
-
-voice **仅控制语气和风格**。它绝不改变准确性、
-研究、引用、验证、内容、教学法或结构 —— 这些是
-`lathe` 技能中的固定不变量。
+voice **仅控制语气和风格**。它绝不改变准确性、研究、引用、验证、内容、教学法或结构——这些是 SKILL.md 中的固定不变量。
 
 ## 内置 voice（供参考）
 
-当用户或其他技能需要内置 voice 时，从以下位置读取：
-
-- **plainspoken**（默认）：`<TUTORIALS_DIR>/voices/plainspoken.md` 或下方内置规范。
-- **companion**：`<TUTORIALS_DIR>/voices/companion.md` 或下方内置规范。
+见 SKILL.md"内置 voice"。内置 voice 规范位于：
+- **plainspoken**（默认）：`<TUTORIALS_DIR>/voices/plainspoken.md` 或 SKILL.md 内置规范。
+- **companion**：`<TUTORIALS_DIR>/voices/companion.md` 或 SKILL.md 内置规范。
 
 ### Plainspoken（内置默认）
 
@@ -49,7 +37,7 @@ voice **仅控制语气和风格**。它绝不改变准确性、
 
 ## 协议
 
-1. **选择名称。** 如果给出了 `/lathe-voice <名称>` 参数则使用它；否则要求一个简短、小写的 slug（如 `terse`、`socratic`、`field-notes`）。它不得与内置名称冲突（`plainspoken`、`companion`）——检查 `<TUTORIALS_DIR>/voices/` 中已有的自定义 voice。
+1. **选择名称。** 如果给出了名称参数则使用它；否则要求一个简短、小写的 slug（如 `terse`、`socratic`、`field-notes`）。它不得与内置名称冲突（`plainspoken`、`companion`）——检查 `<TUTORIALS_DIR>/voices/` 中已有的自定义 voice。
 
 2. **访谈用户。** 简要询问（一轮，分组提问）：
    - **风格：** 正式 ↔ 随意？密集 ↔ 疏朗？冷峻 ↔ 温暖？
@@ -57,7 +45,7 @@ voice **仅控制语气和风格**。它绝不改变准确性、
    - **幽默：** 无、干练/克制还是活泼？绝不以读者为代价。
    - **反模式：** 这种 voice 绝不应该像什么？
 
-3. **起草规范。** voice 规范是一个小型 markdown 文件，包含 `name:`/`description:` 前置元数据和三个工作章节。用以下结构编写：
+3. **起草规范。** voice 规范是一个小型 markdown 文件，包含 `name:`/`description:` 前置元数据和三个工作章节：
    ```markdown
    ---
    name: <名称>
@@ -73,7 +61,7 @@ voice **仅控制语气和风格**。它绝不改变准确性、
    该 voice 拒绝的语气反模式。
 
    ## 校准——对比
-   两三对 ❌/✅ 语气对比（不是教学法对比；教学法对比在 `lathe` 技能中）。
+   两三对 ❌/✅ 语气对比（不是教学法对比；教学法对比在 generate.md 中）。
    > ❌ ...
    > ✅ ...
    ```
@@ -88,11 +76,11 @@ voice **仅控制语气和风格**。它绝不改变准确性、
    如果 `<TUTORIALS_DIR>/voices/` 目录不存在则创建。
 
 6. **告诉用户如何使用：**
-   - 立即使用它生成：`/lathe <主题>` 并指定 voice（*"……用 `<名称>` voice"*）。
+   - 立即使用：`/lathe <主题>` 并指定 voice（*"……用 `<名称>` voice"*）。
    - 要将其设为未来教程的默认值，告诉用户在教程元数据中设置。
    - 之后查看或移除：读取或删除 `<TUTORIALS_DIR>/voices/<名称>.md`。
 
 ## 边界
 
 - **唯一的持久化写入** 是将 voice 文件写入 `<TUTORIALS_DIR>/voices/<名称>.md`。
-- 仅创作语气。如果用户想改变教学法、结构或准确性行为，那是对 `lathe` 技能的修改，不是 voice —— 要明确说明。
+- 仅创作语气。如果用户想改变教学法、结构或准确性行为，那是对教程生成规则的修改，不是 voice——要明确说明。
