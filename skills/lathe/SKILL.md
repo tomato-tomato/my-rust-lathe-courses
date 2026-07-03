@@ -102,6 +102,7 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
   "pending_part": "",
   "repo": "<远程 URL 或空>",
   "repo_branch": "<分支或空>",
+  "local_project_path": "<本地项目路径或空>",
   "tools": [{"name": "<工具>", "version": "<版本>"}],
   "sources": ["<url1>", "<url2>"],
   "voice": "plainspoken",
