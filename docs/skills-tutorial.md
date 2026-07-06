@@ -79,18 +79,18 @@ AI 会引导你完成：确认经验水平 → 锁定工具版本 → 研究主�
 
 ## 操作一览
 
-所有操作通过 `/lathe` 调用，后跟**意图关键词**和参数：
+所有操作通过 `/lathe` 调用，后跟**意图关键词**（中文或英文均可）和参数：
 
 | 操作 | 命令 | 功能 | 写入文件 |
 |------|------|------|----------|
 | **生成教程** | `/lathe <主题>` | 生成教程的第一部分 | `part-01.md`、`metadata.json` |
-| **续写教程** | `/lathe 续写 <slug> [指导]` | 为已有教程添加下一部分 | `part-NN.md`、更新 `metadata.json` |
-| **验证教程** | `/lathe 验证 <slug>` | 端到端验证教程是否可用 | `verify-result.json` |
-| **提问内容** | `/lathe 提问 <slug> <part> <问题>` | 回答关于教程某部分的问题 | 无（只读） |
-| **管理标签** | `/lathe 标签 <slug>` | 管理教程的搜索标签 | 更新 `metadata.json` |
-| **创建语气** | `/lathe 语气 [名称]` | 创建自定义写作语气预设 | `voices/<名称>.md` |
+| **续写教程** | `/lathe 续写\|extend <slug> [指导]` | 为已有教程添加下一部分 | `part-NN.md`、更新 `metadata.json` |
+| **验证教程** | `/lathe 验证\|verify <slug>` | 端到端验证教程是否可用 | `verify-result.json` |
+| **提问内容** | `/lathe 提问\|ask <slug> <part> <问题>` | 回答关于教程某部分的问题 | 无（只读） |
+| **管理标签** | `/lathe 标签\|tag <slug>` | 管理教程的搜索标签 | 更新 `metadata.json` |
+| **创建语气** | `/lathe 语气\|voice [名称]` | 创建自定义写作语气预设 | `voices/<名称>.md` |
 
-> **提示：** 也支持纯自然语言触发（无需 `/lathe`），AI 会自动识别意图。当意图不明确时，AI 会展示选项菜单供你选择。
+> **提示：** 也支持纯自然语言触发（无需 `/lathe`），AI 会自动识别意图。中文和英文关键词均可识别。当意图不明确时，AI 会展示选项菜单供你选择。
 
 ---
 
@@ -226,13 +226,17 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 
 ```
 /lathe 续写 <slug> [指导...]
+# 或使用英文关键词
+/lathe extend <slug> [指导...]
 ```
 
 **示例：**
 
 ```
 /lathe 续写 raft-go
+/lathe extend raft-go
 /lathe 续写 raft-go 这一部分实现日志复制
+/lathe extend raft-go 这一部分实现日志复制
 /lathe 续写 digital-synth-zig 添加低通滤波器
 ```
 
@@ -272,12 +276,15 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 
 ```
 /lathe 验证 <slug>
+# 或使用英文关键词
+/lathe verify <slug>
 ```
 
 **示例：**
 
 ```
 /lathe 验证 raft-go
+/lathe verify raft-go
 ```
 
 ### 工作流程
@@ -317,12 +324,19 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 ```
 /lathe 提问 <slug> <part-NN.md>
 <你的问题>
+
+# 或使用英文关键词
+/lathe ask <slug> <part-NN.md>
+<your question>
 ```
 
 **示例：**
 
 ```
 /lathe 提问 raft-go part-01.md
+为什么用环形缓冲区而不是 channel？
+
+/lathe ask raft-go part-01.md
 为什么用环形缓冲区而不是 channel？
 
 /lathe 提问 digital-synth-zig part-02.md
@@ -348,12 +362,15 @@ AI 在内部完成预检（选择控制性示例、确定章节结构等）后�
 
 ```
 /lathe 标签 <slug>
+# 或使用英文关键词
+/lathe tag <slug>
 ```
 
 **示例：**
 
 ```
 /lathe 标签 raft-go
+/lathe tag raft-go
 ```
 
 ### 标签规范
@@ -395,13 +412,17 @@ AI 会选择 2-5 个小写、可复用的标签，涵盖以下维度：
 
 ```
 /lathe 语气 [名称]
+# 或使用英文关键词
+/lathe voice [name]
 ```
 
 **示例：**
 
 ```
 /lathe 语气 terse
+/lathe voice terse
 /lathe 语气 field-notes
+/lathe voice field-notes
 ```
 
 ### 创建流程
@@ -479,6 +500,7 @@ AI：（研究主题中...查阅了 Raft 论文、Go 标准库文档等 6 个来
 
 ```
 用户：/lathe 续写 raft-go 这一部分实现 Leader 选举
+# 或者：/lathe extend raft-go 这一部分实现 Leader 选举
 
 AI：（阅读已有教程）
     你是否有已完成的本地项目代码？如果有，提供项目路径可以让我基于你当前的实际代码来续写下一部分课程。
@@ -498,6 +520,7 @@ AI：（研究 Leader 选举，生成 part-02.md）
 
 ```
 用户：/lathe 验证 raft-go
+# 或者：/lathe verify raft-go
 
 AI：（在临时目录中逐步执行，运行检查点命令）
     验证结果：
@@ -511,11 +534,13 @@ AI：（在临时目录中逐步执行，运行检查点命令）
 ```
 用户：/lathe 提问 raft-go part-02.md
      为什么选举超时要随机化？
+# 或者：/lathe ask raft-go part-02.md
 
 AI：在 part-02.md 的 "选举超时" 章节中，随机化是为了防止
     两个候选者同时发起选举导致的活锁...
 
 用户：/lathe 标签 raft-go
+# 或者：/lathe tag raft-go
 
 AI：已为教程设置标签：["go", "distributed-systems", "consensus", "raft"]
 ```
@@ -524,6 +549,7 @@ AI：已为教程设置标签：["go", "distributed-systems", "consensus", "raft
 
 ```
 用户：/lathe 语气 socratic
+# 或者：/lathe voice socratic
 
 AI：（进行风格访谈，起草 voice 规范）
     这是 socratic voice 的草稿...是否满意？
@@ -657,7 +683,7 @@ AI：已保存到 ~/others/lathe_tutorials/voices/socratic.md。
 
 ### Q：教程可以跨多个会话续写吗？
 
-可以。每次调用 `/lathe 续写` 时，AI 会从 `metadata.json` 和已有部分文件中读取完整上下文，因此即使换了会话甚至换了 AI 模型，也能无缝续写。
+可以。每次调用 `/lathe 续写`（或 `/lathe extend`）时，AI 会从 `metadata.json` 和已有部分文件中读取完整上下文，因此即使换了会话甚至换了 AI 模型，也能无缝续写。
 
 ### Q：可以在不同的 AI 工具之间切换使用吗？
 
@@ -677,11 +703,11 @@ AI：已保存到 ~/others/lathe_tutorials/voices/socratic.md。
 - 检查点命令的预期输出与实际不符
 - 前置条件遗漏了某个工具
 
-修复教程后重新运行 `/lathe 验证`。
+修复教程后重新运行 `/lathe 验证`（或 `/lathe verify`）。
 
 ### Q：如何修改已生成教程的内容？
 
-直接在编辑器中修改 `part-NN.md` 文件即可。修改后建议重新运行 `/lathe 验证` 确认可用性。
+直接在编辑器中修改 `part-NN.md` 文件即可。修改后建议重新运行 `/lathe 验证`（或 `/lathe verify`）确认可用性。
 
 ### Q：Voice 会影响教程的准确性吗？
 
@@ -698,4 +724,4 @@ grep -rl '"compilers"' ~/others/lathe_tutorials/*/metadata.json
 
 ### Q：意图不明确时会发生什么？
 
-当你只输入 `/lathe` 或输入含糊的内容时，AI 不会默认生成教程，而是展示一个操作选项菜单（生成、续写、验证、提问、标签、语气），让你选择想要执行的操作。
+当你只输入 `/lathe` 或输入含糊的内容时，AI 不会默认生成教程，而是展示一个操作选项菜单（生成 / 续写 extend / 验证 verify / 提问 ask / 标签 tag / 语气 voice），让你选择想要执行的操作。

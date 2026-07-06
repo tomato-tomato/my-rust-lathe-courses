@@ -1,6 +1,6 @@
 ---
 name: lathe
-description: 按需生成、续写、验证、提问动手实践型技术教程。当用户说 /lathe 并附带主题时使用，如 "/lathe 用 Zig 构建数字合成器"；也处理续写、验证、提问、打标签和创建语气等所有教程相关操作。
+description: 按需生成、续写、验证、提问动手实践型技术教程。当用户说 /lathe 并附带主题时使用，如 "/lathe 用 Zig 构建数字合成器"；也处理续写(extend)、验证(verify)、提问(ask)、打标签(tag)和创建语气(voice)等所有教程相关操作。支持中文和英文关键词。
 ---
 
 # Lathe — 教程体系
@@ -9,18 +9,18 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
 
 ## 使用方式
 
-所有操作通过 `/lathe` 调用，后跟**意图关键词**和参数：
+所有操作通过 `/lathe` 调用，后跟**意图关键词**（中文或英文均可）和参数：
 
 ```
-/lathe <主题>                    → 生成新教程
-/lathe 续写 <slug> [指导]        → 续写教程下一部分
-/lathe 验证 <slug>              → 端到端验证教程
-/lathe 提问 <slug> <part> <问题> → 提问教程内容
-/lathe 标签 <slug>              → 管理教程标签
-/lathe 语气 [名称]              → 创建自定义语气
+/lathe <主题>                          → 生成新教程
+/lathe 续写|extend <slug> [指导]       → 续写教程下一部分
+/lathe 验证|verify <slug>              → 端到端验证教程
+/lathe 提问|ask <slug> <part> <问题>   → 提问教程内容
+/lathe 标签|tag <slug>                 → 管理教程标签
+/lathe 语气|voice [名称]               → 创建自定义语气
 ```
 
-也支持纯自然语言触发（无需 `/lathe`），AI 会自动识别意图。
+也支持纯自然语言触发（无需 `/lathe`），AI 会自动识别意图。中文和英文关键词均可识别。
 
 ## 教程存储路径配置
 
@@ -44,20 +44,20 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
 
 根据用户消息中的意图关键词，读取对应模块文件执行完整协议：
 
-| 用户意图 | 识别关键词 | 使用示例 | 读取模块 |
-|----------|------------|----------|----------|
-| **生成新教程** | 主题描述（无下述关键词时） | `/lathe 用 Go 构建 Raft` | [generate.md](generate.md) |
-| **续写教程** | 续写、继续、下一部分、extend、part | `/lathe 续写 raft-go` | [extend.md](extend.md) |
-| **验证教程** | 验证、检查、verify、测试 | `/lathe 验证 raft-go` | [verify.md](verify.md) |
-| **提问内容** | 提问、问、ask、问题、为什么、怎么 | `/lathe 提问 raft-go part-01 为什么用环形缓冲区` | [ask.md](ask.md) |
-| **管理标签** | 标签、tag、打标签 | `/lathe 标签 raft-go` | [tag.md](tag.md) |
-| **创建语气** | 语气、voice、风格、tone | `/lathe 语气 terse` | [voice.md](voice.md) |
+| 用户意图 | 识别关键词（中文 / 英文） | 使用示例 | 读取模块 |
+|----------|-------------------------|----------|----------|
+| **生成新教程** | 主题描述（无下述关键词时） / topic description | `/lathe 用 Go 构建 Raft` | [generate.md](generate.md) |
+| **续写教程** | 续写、继续、下一部分 / extend、continue、next、add、part | `/lathe extend raft-go` 或 `/lathe 续写 raft-go` | [extend.md](extend.md) |
+| **验证教程** | 验证、检查、测试 / verify、check、test、validate | `/lathe verify raft-go` 或 `/lathe 验证 raft-go` | [verify.md](verify.md) |
+| **提问内容** | 提问、问、问题、为什么、怎么 / ask、question、why、how、what | `/lathe ask raft-go part-01 why use ring buffer` | [ask.md](ask.md) |
+| **管理标签** | 标签、打标签 / tag、tags、label | `/lathe tag raft-go` 或 `/lathe 标签 raft-go` | [tag.md](tag.md) |
+| **创建语气** | 语气、风格 / voice、tone、style | `/lathe voice terse` 或 `/lathe 语气 terse` | [voice.md](voice.md) |
 
 **路由规则：**
-1. 解析 `/lathe` 后的第一个关键词来确定意图（如 "续写"、"验证"、"提问"、"标签"、"语气"）。
+1. 解析 `/lathe` 后的第一个关键词来确定意图。中文和英文关键词均可识别（如 "续写" 等价于 "extend"，"验证" 等价于 "verify"，"提问" 等价于 "ask"，"标签" 等价于 "tag"，"语气" 等价于 "voice"）。
 2. **意图不明确时，先询问再执行（见下方"意图歧义处理"）。** 不要擅自假设用户想要生成教程。
 3. 识别到意图后，**立即读取对应模块文件**，按其中的完整协议执行。
-4. 也支持纯自然语言触发（不含 `/lathe`），通过上下文语义匹配意图。
+4. 也支持纯自然语言触发（不含 `/lathe`），通过上下文语义匹配意图，中英文均可。
 5. 模块文件可能引用下方的共享配置。
 
 ## 意图歧义处理
@@ -68,21 +68,23 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
 你想对 Lathe 教程执行什么操作？
 
 1. 🟢 **生成新教程** — 为新主题创建教程第一部分
-2. 📝 **续写教程** — 为已有教程添加下一部分
-3. ✅ **验证教程** — 端到端验证教程是否可用
-4. ❓ **提问内容** — 针对教程某个部分提问
-5. 🏷️ **管理标签** — 为教程选择或更新标签
-6. 🎙️ **创建语气** — 创建自定义写作语气预设
+2. 📝 **续写教程 (extend)** — 为已有教程添加下一部分
+3. ✅ **验证教程 (verify)** — 端到端验证教程是否可用
+4. ❓ **提问内容 (ask)** — 针对教程某个部分提问
+5. 🏷️ **管理标签 (tag)** — 为教程选择或更新标签
+6. 🎙️ **创建语气 (voice)** — 创建自定义写作语气预设
 
-请回复编号或关键词。
+请回复编号或关键词（中英文均可）。
 ```
 
 **歧义判定标准：**
 - `/lathe`（无后续内容） → 歧义，展示选项
 - `/lathe raft-go`（仅 slug，无关键词） → 歧义，展示选项（可能是续写、验证、提问等）
 - `/lathe 这个教程怎么样`（含糊表达） → 歧义，展示选项
+- `/lathe how is this tutorial`（含糊英文表达） → 歧义，展示选项
 - `/lathe 用 Go 构建 Raft`（明确的主题描述） → 明确为**生成新教程**
-- `/lathe 续写 raft-go`（含关键词） → 明确为**续写**
+- `/lathe 续写 raft-go` 或 `/lathe extend raft-go`（含关键词） → 明确为**续写**
+- `/lathe 验证 raft-go` 或 `/lathe verify raft-go`（含关键词） → 明确为**验证**
 
 用户选择后，读取对应模块文件执行。如果用户选择的意图需要额外参数（如续写需要 slug），在读取模块前补充询问。
 

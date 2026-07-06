@@ -175,7 +175,7 @@
 
 然后告诉用户：
 - "**教程已保存**到 `<TUTORIALS_DIR>/<slug>/`。"
-- "这是第一部分。要添加更多部分，调用 `/lathe 续写 <slug>`，可以给出指导或让它自然延续。"
-- "验证是可选的：调用 `/lathe 验证 <slug>`。需要本地安装教程的工具链。"
-- "要对某个部分提问，调用 `/lathe 提问 <slug> part-01.md` 然后跟上你的问题。"
-- "管理标签：`/lathe 标签 <slug>`。创建语气：`/lathe 语气 [名称]`。"
+- "这是第一部分。要添加更多部分，调用 `/lathe 续写 <slug>`（或 `/lathe extend <slug>`），可以给出指导或让它自然延续。"
+- "验证是可选的：调用 `/lathe 验证 <slug>`（或 `/lathe verify <slug>`）。需要本地安装教程的工具链。"
+- "要对某个部分提问，调用 `/lathe 提问 <slug> part-01.md`（或 `/lathe ask <slug> part-01.md`）然后跟上你的问题。"
+- "管理标签：`/lathe 标签 <slug>` 或 `/lathe tag <slug>`。创建语气：`/lathe 语气 [名称]` 或 `/lathe voice [名称]`。"
