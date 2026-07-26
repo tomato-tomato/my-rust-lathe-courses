@@ -5,7 +5,7 @@
 
 经过三个部分的学习，你的 `tasky` 已经是一个功能完整的 CLI 工具：七个子命令、优先级和标签分类、完成时间记录、模块化的代码结构、基本的集成测试。part 3 末尾留了五道练习，你已经完成了前两题（`tags` 字段和 `stats` 命令），还有三道等着我们。
 
-本部分先做一轮核心概念回顾——距离 part 1 已经过了一段时间，所有权、借用、`match`、迭代器这些概念你可能需要重新激活。然后逐步完成剩余的三道练习（单元测试、`clear` 命令、`--data-dir` 全局参数），最后引入一个新主题：为你的自定义类型实现标准库 trait。
+本部分先做一轮核心概念回顾——距离 part 1 已经过了一段时间，所有权、借用、`match`、迭代器这些概念你可能需要重新激活。然后逐步完成剩余的三道练习（`clear` 命令、`--data-dir` 全局参数、单元测试），最后引入一个新主题：为你的自定义类型实现标准库 trait。
 
 本部分结束时，你的 `tasky` 将拥有完整的练习覆盖、可配置的存储路径、以及一个实现了 `Display` trait 的 `Todo` 类型——你可以直接用 `{}` 格式化打印待办事项。
 
@@ -26,7 +26,7 @@ $ tasky clear
 ✓ Cleared 1 completed todo(s)
 ```
 
-新增的能力：`--data-dir` 全局参数让你指定数据存储目录（测试和日常使用分离），`clear` 命令批量清理已完成的待办，单元测试验证 `storage.rs` 的读写逻辑。
+新增的能力：`clear` 命令批量清理已完成的待办，`--data-dir` 全局参数让你指定数据存储目录（测试和日常使用分离），单元测试验证 `storage.rs` 的读写逻辑。
 
 ## 前置条件
 
@@ -156,149 +156,6 @@ use std::fmt::Display;    // 给类型添加 {} 格式化打印的能力（本�
 ```
 
 `#[derive(Serialize)]` 让编译器**自动实现** trait——你不需要手写实现代码。但不是所有 trait 都能 derive：`Display` 需要你自己写 `impl` 块，因为编译器不知道你想怎么"展示"一个待办事项。本部分最后一个章节会详细讲这个。
-
-## 单元测试：验证内部逻辑
-
-part 3 的练习 3 要求你给 `storage.rs` 添加单元测试。现在来完成它。
-
-### 什么是单元测试
-
-Rust 有两种测试：part 3 中你已经写过**集成测试**（在 `tests/` 目录下，测试整个程序的行为）。**单元测试**放在被测试的代码文件内部，验证单个函数或模块的逻辑。
-
-单元测试放在文件底部的 `#[cfg(test)]` 模块中：
-
-```rust
-// storage.rs 的正式代码
-pub fn load_todos() -> Result<Vec<Todo>> { ... }
-pub fn save_todos(todos: &[Todo]) -> Result<()> { ... }
-
-// 文件底部：单元测试
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn some_test() {
-        // 测试代码
-    }
-}
-```
-
-三个新语法要素：
-
-**`#[cfg(test)]`** — 条件编译属性。告诉编译器："这段代码只在 `cargo test` 时编译。" 正常运行 `cargo build` 或 `cargo run` 时，整个 `mod tests` 块被完全忽略——不编译、不占空间。
-
-**`use super::*;`** — 把父模块（也就是 `storage.rs` 顶层）的所有公开和私有项导入测试模块。这让你可以直接调用 `load_todos()` 和 `save_todos()`，不需要写完整路径。`super::*` 中的 `super` 指向父模块，`*` 是 glob 导入（导入所有项）。
-
-**`#[test]`** — 标记一个函数为测试用例。`cargo test` 会自动发现并运行所有带 `#[test]` 注解的函数。
-
-### 断言宏
-
-Rust 提供三个核心断言宏来验证测试结果：
-
-```rust
-// assert!(条件) —— 条件为 false 时测试失败
-assert!(todos.len() > 0);
-
-// assert_eq!(左, 右) —— 两者不相等时测试失败
-assert_eq!(loaded.len(), 3);
-
-// assert_ne!(左, 右) —— 两者相等时测试失败
-assert_ne!(loaded.len(), 0);
-```
-
-断言失败时，Rust 会打印 panic 信息和失败位置。`assert_eq!` 和 `assert_ne!` 还会打印左右两边的实际值（要求类型实现 `Debug` + `PartialEq`），帮你快速定位问题。
-
-### 给 storage.rs 添加测试
-
-我们要验证的核心逻辑是"往返一致性"——写入一组 `Todo`，读回来，数据应该完全相同。
-
-在 `storage.rs` 底部添加：
-
-```rust
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use chrono::Local;
-
-    #[test]
-    fn save_and_load_roundtrip() {
-        // 准备测试数据
-        let todos = vec![
-            Todo {
-                id: 1,
-                content: "测试任务一".to_string(),
-                completed: false,
-                created_at: Local::now(),
-                priority: 0,
-                completed_at: None,
-                tags: vec!["test".to_string()],
-            },
-            Todo {
-                id: 2,
-                content: "测试任务二".to_string(),
-                completed: true,
-                created_at: Local::now(),
-                priority: 2,
-                completed_at: Some(Local::now()),
-                tags: vec![],
-            },
-        ];
-
-        // 写入
-        save_todos(&todos).expect("save should succeed");
-
-        // 读回
-        let loaded = load_todos().expect("load should succeed");
-
-        // 验证
-        assert_eq!(loaded.len(), 2);
-        assert_eq!(loaded[0].id, 1);
-        assert_eq!(loaded[0].content, "测试任务一");
-        assert_eq!(loaded[0].priority, 0);
-        assert!(loaded[0].tags.contains(&"test".to_string()));
-        assert_eq!(loaded[1].id, 2);
-        assert!(loaded[1].completed);
-        assert_eq!(loaded[1].priority, 2);
-        assert!(loaded[1].completed_at.is_some());
-    }
-
-    #[test]
-    fn load_nonexistent_returns_empty() {
-        // load_todos 在文件不存在时应返回空列表
-        // 这个测试验证的是行为而非具体数据
-        let loaded = load_todos().expect("load should succeed");
-        // 不断言具体内容——取决于当前实际数据文件状态
-        assert!(loaded.len() >= 0);
-    }
-}
-```
-
-注意 `use super::*;` 把 `load_todos`、`save_todos`、`data_file` 等全部导入测试模块——包括 `data_file` 这个**私有**函数。这正是单元测试的一个优势：子模块可以访问父模块的私有项，让你能测试内部实现细节。
-
-> [!HEADS-UP]
-> 上面的 `save_and_load_roundtrip` 测试会写入**真实的** `todos.json` 文件（macOS 上位于 `~/Library/Application Support/tasky/todos.json`）。如果你当前有待办数据，运行测试会覆盖它。解决方案有两种：一是在测试前备份你的 `todos.json`，二是先完成下一节的 `--data-dir` 练习（让存储路径可配置），然后在测试中使用临时目录。对于现在，建议先手动备份再运行测试。
-
-运行单元测试：
-
-```bash
-cargo test --lib
-```
-
-`--lib` 只运行单元测试（排除 `tests/` 目录下的集成测试）。预期输出：
-
-```
-running 2 tests
-test tests::save_and_load_roundtrip ... ok
-test tests::load_nonexistent_returns_empty ... ok
-
-test result: ok. 2 passed; 0 failed
-```
-
-如果你想同时运行所有测试（单元 + 集成），用 `cargo test -- --test-threads=1`。
-
-> [!ASIDE]
-> **测试私有函数。** 假设你在 `storage.rs` 中有一个私有的辅助函数 `fn validate_todos(todos: &[Todo]) -> bool`。因为 `tests` 是 `storage` 的子模块，它可以通过 `super::validate_todos(...)` 直接调用。这让你能测试内部逻辑，而不需要把它设为 `pub`——对外接口的最小化原则和可测试性并不矛盾。
 
 ## clear 子命令：批量清理
 
@@ -480,6 +337,149 @@ fn test_add_with_data_dir() {
 }
 ```
 
+## 单元测试：验证内部逻辑
+
+part 3 的练习 3 要求你给 `storage.rs` 添加单元测试。现在来完成它。
+
+### 什么是单元测试
+
+Rust 有两种测试：part 3 中你已经写过**集成测试**（在 `tests/` 目录下，测试整个程序的行为）。**单元测试**放在被测试的代码文件内部，验证单个函数或模块的逻辑。
+
+单元测试放在文件底部的 `#[cfg(test)]` 模块中：
+
+```rust
+// storage.rs 的正式代码
+pub fn load_todos() -> Result<Vec<Todo>> { ... }
+pub fn save_todos(todos: &[Todo]) -> Result<()> { ... }
+
+// 文件底部：单元测试
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn some_test() {
+        // 测试代码
+    }
+}
+```
+
+三个新语法要素：
+
+**`#[cfg(test)]`** — 条件编译属性。告诉编译器："这段代码只在 `cargo test` 时编译。" 正常运行 `cargo build` 或 `cargo run` 时，整个 `mod tests` 块被完全忽略——不编译、不占空间。
+
+**`use super::*;`** — 把父模块（也就是 `storage.rs` 顶层）的所有公开和私有项导入测试模块。这让你可以直接调用 `load_todos()` 和 `save_todos()`，不需要写完整路径。`super::*` 中的 `super` 指向父模块，`*` 是 glob 导入（导入所有项）。
+
+**`#[test]`** — 标记一个函数为测试用例。`cargo test` 会自动发现并运行所有带 `#[test]` 注解的函数。
+
+### 断言宏
+
+Rust 提供三个核心断言宏来验证测试结果：
+
+```rust
+// assert!(条件) —— 条件为 false 时测试失败
+assert!(todos.len() > 0);
+
+// assert_eq!(左, 右) —— 两者不相等时测试失败
+assert_eq!(loaded.len(), 3);
+
+// assert_ne!(左, 右) —— 两者相等时测试失败
+assert_ne!(loaded.len(), 0);
+```
+
+断言失败时，Rust 会打印 panic 信息和失败位置。`assert_eq!` 和 `assert_ne!` 还会打印左右两边的实际值（要求类型实现 `Debug` + `PartialEq`），帮你快速定位问题。
+
+### 给 storage.rs 添加测试
+
+我们要验证的核心逻辑是"往返一致性"——写入一组 `Todo`，读回来，数据应该完全相同。
+
+在 `storage.rs` 底部添加：
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::Local;
+
+    #[test]
+    fn save_and_load_roundtrip() {
+        // 准备测试数据
+        let todos = vec![
+            Todo {
+                id: 1,
+                content: "测试任务一".to_string(),
+                completed: false,
+                created_at: Local::now(),
+                priority: 0,
+                completed_at: None,
+                tags: vec!["test".to_string()],
+            },
+            Todo {
+                id: 2,
+                content: "测试任务二".to_string(),
+                completed: true,
+                created_at: Local::now(),
+                priority: 2,
+                completed_at: Some(Local::now()),
+                tags: vec![],
+            },
+        ];
+
+        // 写入
+        save_todos(&todos, None).expect("save should succeed");
+
+        // 读回
+        let loaded = load_todos(None).expect("load should succeed");
+
+        // 验证
+        assert_eq!(loaded.len(), 2);
+        assert_eq!(loaded[0].id, 1);
+        assert_eq!(loaded[0].content, "测试任务一");
+        assert_eq!(loaded[0].priority, 0);
+        assert!(loaded[0].tags.contains(&"test".to_string()));
+        assert_eq!(loaded[1].id, 2);
+        assert!(loaded[1].completed);
+        assert_eq!(loaded[1].priority, 2);
+        assert!(loaded[1].completed_at.is_some());
+    }
+
+    #[test]
+    fn load_nonexistent_returns_empty() {
+        // load_todos 在文件不存在时应返回空列表
+        // 这个测试验证的是行为而非具体数据
+        let loaded = load_todos(None).expect("load should succeed");
+        // 不断言具体内容——取决于当前实际数据文件状态
+        assert!(loaded.len() >= 0);
+    }
+}
+```
+
+注意 `use super::*;` 把 `load_todos`、`save_todos`、`data_file` 等全部导入测试模块——包括 `data_file` 这个**私有**函数。这正是单元测试的一个优势：子模块可以访问父模块的私有项，让你能测试内部实现细节。
+
+> [!HEADS-UP]
+> 上面的 `save_and_load_roundtrip` 测试会写入**真实的** `todos.json` 文件（macOS 上位于 `~/Library/Application Support/tasky/todos.json`）。测试中传入 `None` 意味着使用默认存储路径——如果你当前有待办数据，运行测试会覆盖它。建议在测试前备份你的 `todos.json`。练习 5 会引导你给集成测试添加 `--data-dir` 支持，让测试使用独立的临时目录，彻底解决这个问题。
+
+运行单元测试：
+
+```bash
+cargo test --bin tasky
+```
+
+`--bin tasky` 只运行 `tasky` 二进制目标中的单元测试（排除 `tests/` 目录下的集成测试）。预期输出：
+
+```
+running 2 tests
+test tests::save_and_load_roundtrip ... ok
+test tests::load_nonexistent_returns_empty ... ok
+
+test result: ok. 2 passed; 0 failed
+```
+
+如果你想同时运行所有测试（单元 + 集成），用 `cargo test -- --test-threads=1`。
+
+> [!ASIDE]
+> **测试私有函数。** 假设你在 `storage.rs` 中有一个私有的辅助函数 `fn validate_todos(todos: &[Todo]) -> bool`。因为 `tests` 是 `storage` 的子模块，它可以通过 `super::validate_todos(...)` 直接调用。这让你能测试内部逻辑，而不需要把它设为 `pub`——对外接口的最小化原则和可测试性并不矛盾。
+
 ## 自定义 trait 实现：fmt::Display
 
 到目前为止，你的 `Todo` 类型使用了 `#[derive(Debug)]` 来支持 `{:?}` 格式化——输出长这样：`Todo { id: 1, content: "买菜", completed: false, ... }`。这对调试很有用，但用户不想看到这种格式。
@@ -626,7 +626,7 @@ cat /tmp/tasky-test/todos.json
 ```
 
 ```bash
-cargo test --lib
+cargo test --bin tasky
 ```
 
 预期输出：单元测试通过。
