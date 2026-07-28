@@ -444,15 +444,19 @@ mod tests {
     }
 
     #[test]
-    fn load_nonexistent_returns_empty() {
-        // load_todos 在文件不存在时应返回空列表
-        // 这个测试验证的是行为而非具体数据
-        let loaded = load_todos(None).expect("load should succeed");
-        // 不断言具体内容——取决于当前实际数据文件状态
-        assert!(loaded.len() >= 0);
+    fn load_default_does_not_crash() {
+        // 冒烟测试：验证 load_todos(None) 能正常运行而不崩溃
+        // 因为 load_todos(None) 指向默认路径，文件可能存在也可能不存在
+        // （save_and_load_roundtrip 测试已在此前写入了数据文件）
+        // 所以这里只验证函数能正常返回 Result，不检查具体内容
+        let result = load_todos(None);
+        assert!(result.is_ok());
     }
 }
 ```
+
+> [!ASIDE]
+> **为什么不能写 `assert!(loaded.len() >= 0)`？** `Vec::len()` 返回 `usize`——无符号整数类型（在 64 位系统上等同于 `u64`）。无符号整数的取值范围是 `0..=18_446_744_073_709_551_615`，在定义上就不可能是负数。所以 `loaded.len() >= 0` 永远为 `true`，Rust 编译器的 `unused_comparisons` lint 会正确地警告这是一个无意义的比较。当你想断言集合为空时，用 `assert!(loaded.is_empty())` 或 `assert_eq!(loaded.len(), 0)`。
 
 注意 `use super::*;` 把 `load_todos`、`save_todos`、`data_file` 等全部导入测试模块——包括 `data_file` 这个**私有**函数。这正是单元测试的一个优势：子模块可以访问父模块的私有项，让你能测试内部实现细节。
 
@@ -470,7 +474,7 @@ cargo test --bin tasky
 ```
 running 2 tests
 test tests::save_and_load_roundtrip ... ok
-test tests::load_nonexistent_returns_empty ... ok
+test tests::load_default_does_not_crash ... ok
 
 test result: ok. 2 passed; 0 failed
 ```
