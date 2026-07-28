@@ -1,3 +1,15 @@
 # macOS
 .DS_Store
-**/.DS_Store
+
+# Rust build artifacts
+target/
+**/*.rs.bk
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Packaged artifacts
+skills.zip
