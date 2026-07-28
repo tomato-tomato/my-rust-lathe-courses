@@ -1,10 +1,32 @@
 # 使用Lathe工具学习Rust
 
-一个使用 [Lathe](https://github.com/devenjarvis/lathe) 来学习Rust的个人仓库记录。本仓库包含将 Lathe 提炼成无 cli 版本的 skills、skills的使用说明、通过 kimi网页版规划的Rust学习路线、通过该skills生成的对应课程 以及 相关学习代码的记录。
+一个使用 [Lathe](https://github.com/devenjarvis/lathe) 来学习Rust的个人仓库记录。本仓库包含：
 
-本仓库中的 skills 通过 Qwen 3.7max 读取 Lathe 中的代码改写生成，可直接复制到QoderWork 的skills文件夹中，直接在 QoderWork 中使用。
+- 将 Lathe 提炼成无 cli 版本的 **skills**（持续迭代中）
+- skills 的 [使用说明文档](./docs/skills-tutorial.md)
+- 通过 kimi 网页版规划的 [Rust 学习路线](./docs/learn-rust-way.md)
+- 通过该 skills 生成的对应课程（`tutorials/`）
+- 相关学习代码的记录（`code/`，submodule）
+
+本仓库中的 skills **初版**通过 Qwen 3.7max 读取 Lathe 中的代码改写生成，后续持续迭代优化：已重构为统一的模块化目录（`skills/lathe/`），支持中英文双语触发、多种内置写作语气与风格标杆体系、教程验证时的版本冲突检测与修复等能力。
+
+**安装使用：** 从本仓库的 GitHub Releases 页面下载最新的 `skills.zip`，解压后复制到 QoderWork 的技能目录即可，详细步骤见 [使用教程](./docs/skills-tutorial.md)。
 
 非常感谢 Lathe 这个工具 🙏 ！终于让我找到适合自己的学习 Rust 的方法。
+
+## Skills 功能一览
+
+所有操作通过 `/lathe` 调用，中英文关键词均可：
+
+| 操作 | 命令 | 功能 |
+|------|------|------|
+| 生成教程 | `/lathe <主题>` | 为任意主题生成动手实践型教程的第一部分 |
+| 续写教程 | `/lathe 续写\|extend <slug>` | 为已有教程添加下一部分，可基于本地实际代码进度 |
+| 验证教程 | `/lathe 验证\|verify <slug>` | 临时目录中端到端执行教程，含版本冲突检测与修复 |
+| 提问内容 | `/lathe 提问\|ask <slug> [part] <问题>` | 基于教程具体内容回答问题 |
+| 管理标签 | `/lathe 标签\|tag <slug>` | 管理教程的搜索标签 |
+| 创建语气 | `/lathe 语气\|voice [名称]` | 创建自定义写作语气预设 |
+| 列出教程 | `/lathe 列表\|list [slug]` | 按编程语言分组列出所有教程及各部分状态 |
 
 ## 本仓库介绍
 
@@ -12,11 +34,12 @@
 
 ```
 my-rust-lathe-courses/
-├── .git/
-├── .gitmodules          
-├── skills/              ← 根据lathe生成的skills
-├── docs/                ← skills使用文档、rust学习相关文档
-├── tutorials/           ← skills生成的课程
+├── .gitmodules
+├── LICENSE
+├── skills/
+│   └── lathe/           ← 统一的模块化技能目录（SKILL.md 入口路由 + 各操作模块）
+├── docs/                ← skills使用文档、rust学习相关文档
+├── tutorials/           ← skills生成的课程（每门课程一个子目录，含 metadata.json 和分部分的 markdown）
 └── code/
     └── todo-cli-rust/   ← 课程对应代码。submodule，内部有独立的 .git
 ```
