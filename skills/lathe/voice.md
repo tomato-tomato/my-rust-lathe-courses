@@ -4,12 +4,9 @@
 
 voice **仅控制语气和风格**。它绝不改变准确性、研究、引用、验证、内容、教学法或结构——这些是 SKILL.md 中的固定不变量。
 
-## 内置 voice（供参考）
+## 内置 voice
 
-见 SKILL.md"内置 voice"。内置 voice 规范位于：
-- **plainspoken**（默认）：`<TUTORIALS_DIR>/voices/plainspoken.md` 或 SKILL.md 内置规范。
-- **companion**：`<TUTORIALS_DIR>/voices/companion.md` 或 SKILL.md 内置规范。
-- **craftsman**：`<TUTORIALS_DIR>/voices/craftsman.md` 或 SKILL.md 内置规范。
+本节是内置 voice 完整规范的**单一事实源**（SKILL.md 仅保留一行索引）。内置 voice 不写入 `<TUTORIALS_DIR>/voices/`——该目录只存放自定义 voice。
 
 ### Plainspoken（内置默认）
 
