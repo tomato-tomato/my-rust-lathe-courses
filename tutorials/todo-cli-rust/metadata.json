@@ -5,10 +5,11 @@
   "created": "2026-06-13T00:00:00+08:00",
   "status": "unverified",
   "tags": ["rust", "cli", "command-line", "todo", "beginner"],
-  "parts": ["part-01.md", "part-02.md", "part-03.md", "part-04.md"],
+  "parts": ["part-01.md", "part-02.md", "part-03.md", "part-04.md", "part-05.md"],
   "pending_part": "",
   "repo": "",
   "repo_branch": "",
+  "local_project_path": "/Users/yanlingfeng/Code/Rust/lathe_rust/todo-cli-rust",
   "tools": [
     {"name": "rust", "version": "1.96.0"},
     {"name": "clap", "version": "4"},
@@ -48,7 +49,13 @@
     "https://doc.rust-lang.org/book/ch10-02-traits.html",
     "https://doc.rust-lang.org/std/fmt/trait.Display.html",
     "https://doc.rust-lang.org/book/ch11-01-writing-tests.html",
-    "https://doc.rust-lang.org/std/vec/struct.Vec.html#method.retain"
+    "https://doc.rust-lang.org/std/vec/struct.Vec.html#method.retain",
+    "https://doc.rust-lang.org/std/vec/struct.Vec.html#method.sort_by",
+    "https://doc.rust-lang.org/std/cmp/trait.Ord.html",
+    "https://doc.rust-lang.org/std/cmp/trait.PartialEq.html",
+    "https://doc.rust-lang.org/std/cmp/enum.Ordering.html",
+    "https://doc.rust-lang.org/std/convert/trait.From.html",
+    "https://docs.rs/tempfile/latest/tempfile/"
   ],
   "voice": "plainspoken",
   "model": "QoderWork"

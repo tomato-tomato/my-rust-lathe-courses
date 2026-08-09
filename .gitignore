@@ -13,3 +13,6 @@ target/
 
 # Packaged artifacts
 skills.zip
+
+# solomd
+**/.solomd/
