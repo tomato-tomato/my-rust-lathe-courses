@@ -41,24 +41,28 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
 
 > 默认值 `~/others/lathe_tutorials/` 是之前一直使用的位置，已存在的教程都在那里。
 
+## 技能目录
+
+本技能的入口文件是 `SKILL.md`，各操作模块文件位于其同级的 `references/` 子目录下。后文中用 `<SKILL_DIR>` 代指 **SKILL.md 所在目录**（如 `~/.qoder/skills/lathe` 或 `<项目>/.reasonix/skills/lathe`）——需要读取模块文件时，路径以该目录为准。
+
 ## 操作路由
 
 根据用户消息中的意图关键词，读取对应模块文件执行完整协议：
 
 | 用户意图 | 识别关键词（中文 / 英文） | 使用示例 | 读取模块 |
 |----------|-------------------------|----------|----------|
-| **生成新教程** | 主题描述（无下述关键词时） / topic description | `/lathe 用 Go 构建 Raft` | [generate.md](generate.md) |
-| **续写教程** | 续写、继续、下一部分 / extend、continue、next、add、part | `/lathe extend raft-go` 或 `/lathe 续写 raft-go` | [extend.md](extend.md) |
-| **验证教程** | 验证、检查、测试 / verify、check、test、validate | `/lathe verify raft-go` 或 `/lathe 验证 raft-go` | [verify.md](verify.md) |
-| **提问内容** | 提问、问、问题 / ask、question | `/lathe ask raft-go part-01 why use ring buffer` | [ask.md](ask.md) |
-| **管理标签** | 标签、打标签 / tag、tags、label | `/lathe tag raft-go` 或 `/lathe 标签 raft-go` | [tag.md](tag.md) |
-| **创建语气** | 语气、风格 / voice、tone、style | `/lathe voice terse` 或 `/lathe 语气 terse` | [voice.md](voice.md) |
-| **列出教程** | 列表、列出、查看状态 / list、ls、status | `/lathe list` 或 `/lathe 列表 raft-go` | [list.md](list.md) |
+| **生成新教程** | 主题描述（无下述关键词时） / topic description | `/lathe 用 Go 构建 Raft` | [references/generate.md](references/generate.md) |
+| **续写教程** | 续写、继续、下一部分 / extend、continue、next、add、part | `/lathe extend raft-go` 或 `/lathe 续写 raft-go` | [references/extend.md](references/extend.md) |
+| **验证教程** | 验证、检查、测试 / verify、check、test、validate | `/lathe verify raft-go` 或 `/lathe 验证 raft-go` | [references/verify.md](references/verify.md) |
+| **提问内容** | 提问、问、问题 / ask、question | `/lathe ask raft-go part-01 why use ring buffer` | [references/ask.md](references/ask.md) |
+| **管理标签** | 标签、打标签 / tag、tags、label | `/lathe tag raft-go` 或 `/lathe 标签 raft-go` | [references/tag.md](references/tag.md) |
+| **创建语气** | 语气、风格 / voice、tone、style | `/lathe voice terse` 或 `/lathe 语气 terse` | [references/voice.md](references/voice.md) |
+| **列出教程** | 列表、列出、查看状态 / list、ls、status | `/lathe list` 或 `/lathe 列表 raft-go` | [references/list.md](references/list.md) |
 
 **路由规则：**
 1. 解析 `/lathe` 后的第一个关键词来确定意图。中文和英文关键词均可识别（如 "续写" 等价于 "extend"，"验证" 等价于 "verify"，"提问" 等价于 "ask"，"标签" 等价于 "tag"，"语气" 等价于 "voice"，"列表" 等价于 "list"）。疑问词（为什么、怎么 / why、how、what）**仅在同时给出已知 slug 时**视为提问意图，否则按歧义处理——避免把 `/lathe 怎么用` 这类话误判为 ask。
 2. **意图不明确时，先询问再执行（见下方"意图歧义处理"）。** 不要擅自假设用户想要生成教程。
-3. 识别到意图后，**立即读取对应模块文件**，按其中的完整协议执行。
+3. 识别到意图后，**立即读取对应模块文件**（位于 `<SKILL_DIR>/references/`），按其中的完整协议执行。
 4. 也支持纯自然语言触发（不含 `/lathe`），通过上下文语义匹配意图，中英文均可。
 5. 模块文件可能引用下方的共享配置。
 
@@ -156,7 +160,7 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
 ## 来源（编号，格式：[标题](url) —— 一句话说明；超过约 5 条则分组）
 ```
 
-每个部分以 *"在本部分结束时，你将拥有 [具体的东西]"* 开头，以检查点结尾。每个部分独立成篇。本节是教程结构的**单一事实源**；generate.md 只补充具体写法细节，不重新定义结构。
+每个部分以 *"在本部分结束时，你将拥有 [具体的东西]"* 开头，以检查点结尾。每个部分独立成篇。本节是教程结构的**单一事实源**；references/generate.md 只补充具体写法细节，不重新定义结构。
 
 ## 共享配置：标注类型
 
@@ -175,41 +179,7 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
 
 ## 共享配置：风格标杆
 
-十位标杆作者代表了 Lathe 教程的质量基准线：五位**核心标杆**定义整体水准，五位**扩展参考**在特定维度上补充。生成教程时，根据主题和场景**侧重参考**不同作者的长项。
-
-### 标杆作者
-
-| 作者 | 定位 | 代表作 | 核心风格 |
-|------|------|--------|----------|
-| **Robert Nystrom** | 核心 | *Crafting Interpreters*、*Game Programming Patterns* | 散文式构建：先讲"为什么"再讲"怎么做"，每章独立成篇，手绘插图，恰到好处的幽默 |
-| **Sam Who** | 核心 | samwho.dev（Raft、Bloom Filter、LSM Tree） | 极简散文 + 交互可视化：每句都有信息量，篇幅精炼，具体数字驱动 |
-| **Julia Evans** | 核心 | jvns.ca、*Bite Size* zine 系列 | 亲切去神秘化：像经验丰富的同事在白板前聊天，善用类比和漫画，技术精确 |
-| **Bartosz Ciechanowski** | 核心 | ciechanow.ski（Cameras、Mechanical Watch、GPS） | 极致深度拆解：逐层揭示系统，每件艺术品级的交互配合深思熟虑的散文 |
-| **Amit Patel** | 核心 | Red Blob Games（A*、Graphs、Map Generation） | 交互式算法教程：平实精确，可运行演示驱动，"边做边学"结构 |
-| **Martin Kleppmann** | 扩展 | *Designing Data-Intensive Applications* | 系统设计 + 工程权衡分析，将抽象概念落地为具体实现路径 |
-| **Steve Klabnik & Carol Nichols** | 扩展 | *The Rust Programming Language* | 渐进式引入、兼顾新手与老手、社区共建风格 |
-| **Andy Matuschak** | 扩展 | andymatuschak.org | 主动回忆、间隔重复、知识沉淀理念 |
-| **Gary Bernhardt** | 扩展 | *Destroy All Software* | 极简主义、从本质出发、"少即是多" |
-| **Bret Victor** | 扩展 | worrydream.com | "让知识看得见"、交互教学哲学、即时反馈 |
-
-### 场景侧重
-
-生成教程时，根据主题特征**侧重参考**对应作者的长项。这不是排他的——好教程融合多种风格，但每个场景有一个主锚点：
-
-| 场景 | 主锚点 | 参考什么 | 示例主题 |
-|------|--------|----------|----------|
-| **构建编译器/解释器/语言工具** | Nystrom | 散文节奏、章节独立性、先展示错误再修复的节拍 | PL 编译器、DSL 解释器、解析器组合子 |
-| **算法/数据结构/数学可视化** | Amit Patel | 可交互演示、渐进式揭示、平实精确的语言 | 寻路算法、噪声函数、图算法、几何计算 |
-| **系统底层/硬件/协议拆解** | Ciechanowski | 逐层拆解的深度、从外到内的揭示顺序 | 操作系统内核、网络协议栈、GPU 管线、机械结构 |
-| **分布式系统/基础设施** | Sam Who | 精炼散文、交互可视化、具体数字驱动 | Raft/Paxos 共识、分布式哈希表、LSM 存储引擎 |
-| **日常工具/去神秘化/入门** | Julia Evans | 亲切语气、类比驱动、去神秘化叙事 | Linux 命令行、HTTP 调试、DNS 原理、容器基础 |
-| **系统架构/工程权衡** | Martin Kleppmann | 权衡分析结构、将抽象概念落地为具体实现路径 | 数据一致性、消息队列、缓存策略 |
-| **Rust 语言相关** | Steve Klabnik & Carol Nichols | 渐进式引入、兼顾新手与老手、社区共建风格 | Rust 所有权、生命周期、异步编程 |
-| **涉及记忆/回顾机制设计** | Andy Matuschak | 主动回忆、间隔重复、知识沉淀理念 | 教程中 `[!PREDICT]`/`[!RECALL]` 标注的设计 |
-| **底层原理/追本溯源** | Gary Bernhardt | 极简主义、从本质出发、"少即是多" | Unix 哲学、编码原理、类型系统基础 |
-| **需要"让概念可见"的交互** | Bret Victor | 交互式教学哲学、视觉化表达、即时反馈 | 信号处理、物理模拟、数学概念可视化 |
-
-**使用方式：** 生成教程时，先按主题匹配场景行，侧重参考主锚点作者的长项来指导写作节奏和结构选择。如果主题跨多个场景，选最强的一个作为主锚点，其余为辅。
+标杆作者体系定义 Lathe 教程的质量基准线（五位核心标杆 + 五位扩展参考），并按主题场景给出主锚点选择。**完整作者表与场景侧重表见 [references/style-benchmarks.md](references/style-benchmarks.md)——仅在生成/续写教程、需要确定写作节奏与结构时读取；提问、标签、列表等轻量操作无需加载。**
 
 ## 共享配置：内置 voice
 
@@ -217,7 +187,7 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
 - **companion** —— 键盘旁温暖而幽默的朋友。第一人称，有主见，破折号式自我纠正。
 - **craftsman** —— 从容的匠人师傅。散文式构建，长短句交替，精心打磨的类比贯穿段落，克制的机智。
 
-以上仅为一行索引；**完整规范（风格细节与反模式清单）的单一事实源在 [voice.md](voice.md) "内置 voice"一节**。应用 voice 时（生成/续写）读取 voice.md 获取完整规范。
+以上仅为一行索引；**完整规范（风格细节与反模式清单）的单一事实源在 [references/voice.md](references/voice.md) "内置 voice"一节**。应用 voice 时（生成/续写），仅当用户指定了非默认 voice 才读取 references/voice.md；默认 plainspoken 直接使用上方索引即可。
 
 voice 仅控制语气；绝不改变准确性、研究、引用、验证规则。
 

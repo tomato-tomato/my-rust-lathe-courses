@@ -1,8 +1,8 @@
-# Lathe 技能在 QoderWork 中的使用教程
+# Lathe 技能使用教程
 
 Lathe 是一套面向 LLM 编码助手的**动手实践型教程生成技能体系**。通过一个统一的 `/lathe` 命令，你可以按需生成高质量的技术教程，并逐步续写、验证、提问和管理。
 
-> 本教程适用于 **QoderWork** 或 **QoderWork CN** 桌面客户端。本仓库中的技能当前仅在这两款客户端中使用过，其他场景需要注意验证
+> 本教程适用于 **QoderWork** 或 **QoderWork CN** 桌面客户端。本仓库中的技能在这两款客户端中使用过；技能采用标准 Agent Skills 布局（SKILL.md + references/ 子目录），也已确认兼容 Reasonix 等支持该标准的终端 Agent（见[常见问题](#常见问题)），其他场景需要注意验证
 
 ## 目录
 
@@ -37,16 +37,20 @@ unzip skills.zip -d ./skills-download
 
 ```
 skills-download/
-└── lathe/               ← 统一技能文件夹
-    ├── SKILL.md          ← 入口路由 + 共享配置
-    ├── generate.md       ← 生成教程模块
-    ├── extend.md         ← 续写教程模块
-    ├── verify.md         ← 验证教程模块
-    ├── ask.md            ← 提问模块
-    ├── tag.md            ← 标签模块
-    ├── voice.md          ← 语气模块
-    └── list.md           ← 列表模块
+└── lathe/                          ← 统一技能文件夹
+    ├── SKILL.md                     ← 入口路由 + 共享配置
+    └── references/                  ← 操作模块（按需加载，请勿单独移动）
+        ├── generate.md              ← 生成教程模块
+        ├── extend.md                ← 续写教程模块
+        ├── verify.md                ← 验证教程模块
+        ├── ask.md                   ← 提问模块
+        ├── tag.md                   ← 标签模块
+        ├── voice.md                 ← 语气模块
+        ├── list.md                  ← 列表模块
+        └── style-benchmarks.md      ← 风格标杆（生成/续写时参考）
 ```
+
+> **提示：** 安装时必须连同 `references/` 子目录一起复制——它是技能的标准布局（Anthropic Agent Skills 规范），模块文件按需加载，能减少每次调用的上下文开销。
 
 ### 2. 安装技能
 
@@ -63,7 +67,7 @@ cp -r skills-download/* .qoderwork/skills/
 
 > **提示：** 用户级安装（`~/.qoderwork/skills/`）只需操作一次，之后在所有项目中都可使用这些技能。
 >
-> 本仓库中的技能仅在 QoderWork 和 QoderWork CN 客户端上经过测试
+> 本仓库中的技能已在 QoderWork 和 QoderWork CN 客户端上测试；如需在 Reasonix 中使用，将 `lathe/` 目录复制到 `~/.reasonix/skills/` 即可（见[常见问题](#常见问题)）。
 
 ### 3. 验证安装
 
@@ -187,7 +191,7 @@ AI 用**一条消息**集中收集写作前需要的全部信息，不再多轮�
 教程正文语言默认跟随你的对话语言，也可显式指定（如"用英文写"），结果记录在 `metadata.json` 的 `language` 字段，后续续写/提问自动沿用。
 
 **4. 研究主题**
-AI 会通过网络搜索查阅 3-8 个权威来源（官方文档、论文、源代码等），确保教程内容基于真实资料而非模型记忆。同时执行**版本-特性一致性检查**：示例代码使用的特性必须在锁定版本下成立（如 Rust edition 与代码语义匹配），不确定时查官方 changelog。
+AI 会通过网络搜索查阅权威来源（官方文档、论文、源代码等），确保教程内容基于真实资料而非模型记忆。研究采用**摘要优先**策略：先从搜索结果标题与摘要中提取事实，仅对关键来源做全文抓取，查阅来源总数不超过 5 个——在保证准确性的同时控制耗时与开销。同时执行**版本-特性一致性检查**：示例代码使用的特性必须在锁定版本下成立（如 Rust edition 与代码语义匹配），不确定时查官方 changelog。
 
 > 如果当前会话没有网络工具，AI 会提前告知，并在关键声明处标记 `[!UNVERIFIED]`。
 
@@ -551,7 +555,7 @@ AI：已创建配置。开始前请一次性确认几件事：
 
 用户：有一定了解，独立教程，Go 1.22 可以
 
-AI：（研究主题中...查阅了 Raft 论文、Go 标准库文档等 6 个来源，
+AI：（研究主题中...以摘要优先策略查阅了 Raft 论文、Go 标准库文档等来源，
       并校验示例代码特性与 Go 1.22 兼容）
     （生成 part-01.md 和 metadata.json，正文语言跟随对话记为 zh-CN）
 
@@ -764,13 +768,16 @@ AI：已保存到 ~/others/lathe_tutorials/voices/socratic.md。
 
 ### Q：可以在不同的 AI 工具之间切换使用吗？
 
-技能文件（SKILL.md）虽然是标准的 Markdown 格式，但本仓库中的技能**专为 QoderWork 和 QoderWork CN 客户端设计和测试**。在其他工具（如 Qoder、Qwen Code 等）中可能无法正常工作，不推荐使用。
+技能采用标准的 Agent Skills 布局（`SKILL.md` 入口 + `references/` 子目录），这是 Anthropic 提出的开放规范，多个 AI 工具均已支持：
 
-技能目录参考：
+| 客户端 | 用户级目录 | 项目级目录 | 状态 |
+| --- | --- | --- | --- |
+| QoderWork / QoderWork CN | `~/.qoderwork/skills/` | `.qoderwork/skills/` | ✅ 已测试 |
+| Reasonix（DeepSeek 原生终端 Agent） | `~/.reasonix/skills/` | `.reasonix/skills/` 或 `.claude/skills/` | ✅ 机制已验证（原生支持 SKILL.md 标准，自动注入 references/ 内容，配合 DeepSeek V4 使用） |
 
-| 客户端 | 用户级目录 | 项目级目录 |
-| --- | --- | --- |
-| QoderWork / QoderWork CN | `~/.qoderwork/skills/` | `.qoderwork/skills/` |
+在未列出的其他工具（如 Qoder、Qwen Code 等）中可能无法正常工作，使用前建议先小规模验证。
+
+> **提示：** 教程数据存储在 `~/.lathe/config.json` 指定的目录（默认 `~/others/lathe_tutorials/`），与具体客户端无关——在 QoderWork 和 Reasonix 之间切换时，教程、标签、验证结果完全共享。
 
 ### Q：验证失败了怎么办？
 

@@ -2,16 +2,16 @@
 
 为已存储的教程添加下一部分。新部分必须延续*该*教程——它的示例、它的数字、它的 voice、它的风格标杆侧重——而不是一篇全新的泛化教程。
 
-关于结构、标注和风格标杆的所有内容来自 SKILL.md 的不变量、教程结构和风格标杆节；研究纪律和写法细节来自 generate.md。
+关于结构、标注和风格标杆的所有内容来自 `<SKILL_DIR>/SKILL.md` 的不变量、教程结构和风格标杆节；研究纪律和写法细节来自 `<SKILL_DIR>/references/generate.md`。
 
 ## 协议
 
 1. **吸收现有教程。** 阅读 `<TUTORIALS_DIR>/<slug>/` 中的每个部分（`part-NN.md`）和 `metadata.json`。在写下一个字之前你需要关键的上下文：
    - **控制性示例**和**固定数字**（采样率、页面大小、缓冲区大小）——精确复用它们。
    - **控制性隐喻**（如有），以及之前的部分是否已告别它。
-   - **voice**。从 `metadata.json` 读取 `voice` 字段并应用对应的 voice 规范（内置 voice 的完整规范见 [voice.md](voice.md) "内置 voice"一节；自定义 voice 读取 `<TUTORIALS_DIR>/voices/<名称>.md`）。不要重新选择或漂移 voice；结构和内容仍遵循 SKILL.md 的教程结构，它在与 voice 冲突时获胜。
-   - **语言**。从 `metadata.json` 读取 `language` 字段，新部分保持同一语言（见 SKILL.md"教程语言"）；字段缺失时按已有部分推断并在本次更新 metadata 时补上。
-   - **风格标杆侧重**。延续之前部分的风格标杆主锚点（见 SKILL.md"风格标杆"场景侧重表）——如果 part-01 按 Nystrom 式散文节奏写，新部分保持相同的写作节奏和结构选择，不要切换到其他风格标杆。
+   - **voice**。从 `metadata.json` 读取 `voice` 字段并应用对应的 voice 规范（内置 voice 的完整规范见 `<SKILL_DIR>/references/voice.md` "内置 voice"一节；自定义 voice 读取 `<TUTORIALS_DIR>/voices/<名称>.md`）。不要重新选择或漂移 voice；结构和内容仍遵循 `<SKILL_DIR>/SKILL.md` 的教程结构，它在与 voice 冲突时获胜。
+   - **语言**。从 `metadata.json` 读取 `language` 字段，新部分保持同一语言（见 `<SKILL_DIR>/SKILL.md`"教程语言"）；字段缺失时按已有部分推断并在本次更新 metadata 时补上。
+   - **风格标杆侧重**。延续之前部分的风格标杆主锚点（见 `<SKILL_DIR>/references/style-benchmarks.md` 场景侧重表）——如果 part-01 按 Nystrom 式散文节奏写，新部分保持相同的写作节奏和结构选择，不要切换到其他风格标杆。
    - **读者的水平**。
    - **仓库和锁定的工具版本**在 `metadata.json` 中（`repo`、`repo_branch`、`tools`）——新部分*继承*它们。基于相同版本写作；不要静默升级到更新的工具链。（如果读者明确想迁移到新版本，这是一个信号——可能是时候创建一个新教程了。）
    - 上一部分 **"接下来"** 指向的方向——除非用户的指导重新定向，否则这就是你的任务。

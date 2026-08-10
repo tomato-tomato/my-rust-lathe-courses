@@ -11,7 +11,7 @@
 1. **枚举教程目录。** 列出 `<TUTORIALS_DIR>/` 下每个包含 `metadata.json` 的子目录（跳过 `voices/` 等非教程目录）。
 2. **读取每个教程的 `metadata.json`**，如存在则同时读取 `verify-result.json`。
 3. **识别每个教程的编程语言**（用于分组）：
-   - 优先取 `tags` 中的语言/运行时标签（tag.md 约定的第一类标签，如 `rust`、`zig`、`go`）；
+   - 优先取 `tags` 中的语言/运行时标签（`<SKILL_DIR>/references/tag.md` 约定的第一类标签，如 `rust`、`zig`、`go`）；
    - `tags` 中没有语言标签时，从 `tools`（工具链名称）或 `topic` 推断；
    - 仍无法判断的归入 **其他** 组。
 4. **分组展示**：
