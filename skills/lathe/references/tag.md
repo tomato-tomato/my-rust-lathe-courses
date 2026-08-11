@@ -4,7 +4,7 @@
 
 ## 协议
 
-1. **阅读教程**，路径为 `<TUTORIALS_DIR>/<slug>/` —— 读取 `metadata.json` 并浏览各部分，理解它实际教授的内容。
+1. **阅读教程。** 按 `<SKILL_DIR>/SKILL.md`"教程位置解析规则"定位该教程目录，读取 `metadata.json` 并浏览各部分，理解它实际教授的内容。**若 `metadata.json` 缺失或损坏**，先执行 `<SKILL_DIR>/SKILL.md`"metadata.json 自愈"，用户确认重建后再打标签（重建时已推断的 `tags` 可作为候选，由用户确认或调整）。
 
 2. **选择 2-5 个小写、可复用的标签。** 在适用时涵盖：
    - **语言/运行时** —— `zig`、`rust`、`go`；
