@@ -38,20 +38,21 @@ unzip skills-0.5.0.zip -d ./skills-download
 
 ```
 skills-download/
-├── lathe/                          ← 统一技能文件夹
-│   ├── SKILL.md                     ← 入口路由 + 共享配置
-│   └── references/                  ← 操作模块（按需加载，请勿单独移动）
-│       ├── generate.md              ← 生成教程模块
-│       ├── extend.md                ← 续写教程模块
-│       ├── verify.md                ← 验证教程模块
-│       ├── ask.md                   ← 提问模块
-│       ├── tag.md                   ← 标签模块
-│       ├── voice.md                 ← 语气模块
-│       ├── list.md                  ← 列表模块
-│       ├── review.md                ← 复习模块
-│       └── style-benchmarks.md      ← 风格标杆（生成/续写时参考）
-└── skills-tutorial.md              ← 本使用教程（随包分发，无需安装）
+└── lathe/                          ← 统一技能文件夹
+    ├── SKILL.md                     ← 入口路由 + 共享配置
+    └── references/                  ← 操作模块（按需加载，请勿单独移动）
+        ├── generate.md              ← 生成教程模块
+        ├── extend.md                ← 续写教程模块
+        ├── verify.md                ← 验证教程模块
+        ├── ask.md                   ← 提问模块
+        ├── tag.md                   ← 标签模块
+        ├── voice.md                 ← 语气模块
+        ├── list.md                  ← 列表模块
+        ├── review.md                ← 复习模块
+        └── style-benchmarks.md      ← 风格标杆（生成/续写时参考）
 ```
+
+> 压缩包内仅包含 `lathe/` 技能文件夹本身；本使用教程不随包分发，可在本仓库的 `docs/skills-tutorial.md` 查阅。
 
 > **提示：** 安装时必须连同 `references/` 子目录一起复制——它是技能的标准布局（Anthropic Agent Skills 规范），模块文件按需加载，能减少每次调用的上下文开销。
 
