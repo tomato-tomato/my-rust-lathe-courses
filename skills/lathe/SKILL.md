@@ -56,6 +56,7 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
 
 - **生成新教程：** 每次生成前都询问本课程保存位置（默认提议 `tutorials_base_path`）；保存后将该教程登记到 `tutorial_paths`。
 - **操作已有教程（带 slug）：** 先查 `tutorial_paths[<slug>]`；未登记则回退到 `tutorials_base_path`；该位置也找不到此 slug 时，列出 config 中已知的所有 slug 及其位置供用户选择。
+- **枚举教程目录时（扫描、列表等），跳过以 `.` 开头的隐藏目录**——如验证工作区 `.lathe-verify/`（见 references/verify.md），它们不是教程。
 - 后文中 `<TUTORIALS_DIR>` 指**默认基础目录**（`tutorials_base_path`）；涉及具体教程时，该教程的路径按上述规则解析到其实际所在目录。`voices/` 目录始终位于默认基础目录下。
 
 > 兼容性：仅含 `tutorials_base_path` 的旧 config 继续可用——等价于 `tutorial_paths` 缺失的状态，已有教程无需迁移。
@@ -138,12 +139,17 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
   "tools": [{"name": "<工具>", "version": "<版本>"}],
   "sources": ["<url1>", "<url2>"],
   "voice": "plainspoken",
-  "model": "<AI 模型名称，如 QoderWork>"
+  "model": "<AI 模型名称，如 QoderWork>",
+  "verify_workspace": {
+    "path": ".lathe-verify/",
+    "note": "📦 教程验证工作区：/lathe 验证 在此目录中执行教程代码，并在再次验证时增量复用（不重新生成已有代码）。可以安全删除，下次验证会自动重建。"
+  }
 }
 ```
 
 > 旧教程的 metadata 可能含有已废弃的 `pending_part` 字段——读取时忽略，写回时不必保留。
 > `_warning` 字段是给用户的防误删提醒，技能读取时忽略其内容；新建或写回 metadata 时保留（旧教程缺少的在下次写回时补上）。JSON 不支持注释，故用此字段承载提醒。
+> `verify_workspace` 字段由 verify 首次创建工作区时写入，用于向用户说明教程目录下 `.lathe-verify/` 的作用；旧教程若存在该目录但 metadata 缺少此字段，在下次写回时补上。
 
 **status 状态机：**
 

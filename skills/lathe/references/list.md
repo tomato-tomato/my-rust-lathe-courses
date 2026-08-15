@@ -8,7 +8,7 @@
 
 ### 无参数：`/lathe list` 或 `/lathe 列表`
 
-1. **多路径枚举教程目录。** 解析 `~/.lathe/config.json`，取所有基础目录的并集（`tutorial_paths` 各值 + `tutorials_base_path`，去重）；在每个目录下列出含 `metadata.json` 的子目录（跳过 `voices/` 等非教程目录）。另将**有 `part-*.md` 但缺 `metadata.json`** 的子目录识别为 metadata 缺失的教程（见第 6 步）。同一 slug 出现在多个目录时全部列出并在位置列标注，提醒用户存在副本。
+1. **多路径枚举教程目录。** 解析 `~/.lathe/config.json`，取所有基础目录的并集（`tutorial_paths` 各值 + `tutorials_base_path`，去重）；在每个目录下列出含 `metadata.json` 的子目录（跳过 `voices/` 等非教程目录；**跳过以 `.` 开头的隐藏目录**——如验证工作区 `.lathe-verify/`）。另将**有 `part-*.md` 但缺 `metadata.json`** 的子目录识别为 metadata 缺失的教程（见第 6 步）。同一 slug 出现在多个目录时全部列出并在位置列标注，提醒用户存在副本。
 2. **读取每个教程的 `metadata.json`**，如存在则同时读取 `verify-result.json`。
 3. **识别每个教程的编程语言**（用于分组）：
    - 优先取 `tags` 中的语言/运行时标签（`<SKILL_DIR>/references/tag.md` 约定的第一类标签，如 `rust`、`zig`、`go`）；
