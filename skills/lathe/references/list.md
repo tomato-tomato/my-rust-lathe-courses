@@ -8,7 +8,7 @@
 
 ### 无参数：`/lathe list` 或 `/lathe 列表`
 
-1. **枚举教程目录。** 列出 `<TUTORIALS_DIR>/` 下每个包含 `metadata.json` 的子目录（跳过 `voices/` 等非教程目录）。
+1. **多路径枚举教程目录。** 解析 `~/.lathe/config.json`，取所有基础目录的并集（`tutorial_paths` 各值 + `tutorials_base_path`，去重）；在每个目录下列出含 `metadata.json` 的子目录（跳过 `voices/` 等非教程目录）。另将**有 `part-*.md` 但缺 `metadata.json`** 的子目录识别为 metadata 缺失的教程（见第 6 步）。同一 slug 出现在多个目录时全部列出并在位置列标注，提醒用户存在副本。
 2. **读取每个教程的 `metadata.json`**，如存在则同时读取 `verify-result.json`。
 3. **识别每个教程的编程语言**（用于分组）：
    - 优先取 `tags` 中的语言/运行时标签（`<SKILL_DIR>/references/tag.md` 约定的第一类标签，如 `rust`、`zig`、`go`）；
@@ -21,31 +21,33 @@
 
    ```
    **<slug>** — <标题>
-   状态：<status> ｜ 最近验证：<verify status + checked_at，无则 —> ｜ 标签：<tags> ｜ 正文语言：<language>
+   状态：<status> ｜ 最近验证：<verify status + checked_at，无则 —> ｜ 标签：<tags> ｜ 正文语言：<language> ｜ 位置：<所在目录，与默认目录相同时可省略>
    部分（<N>）：
    1. part-01.md — <该部分的一级标题>
    2. part-02.md — <该部分的一级标题>
    3. part-03.md — <该部分的一级标题>
    ```
 
-   - 部分列表来自 `metadata.json` 的 `parts` 数组，各部分标题读取对应 `part-NN.md` 的一级标题（只读标题行，不加载全文）。
-   - 若验证结果含逐部分明细（`parts` 数组），在对应部分后标注 `✅ passed` / `❌ failed` / `⏭️ not_run`。
-6. **结尾给出总览一句话**：共几门语言、几门课程、几个部分，以及有多少课程尚未验证。
-7. **目录为空或不存在时**：告诉用户还没有教程，提示用 `/lathe <主题>` 生成第一个。
+   - 部分列表来自 `metadata.json` 的 `parts` 数组，各部分标题读取对应文件的一级标题（只读标题行，不加载全文）。文件名含 `-review` 后缀的在标题后标注 *（复习）*。
+   - 若验证结果含逐部分明细（`parts` 数组），在对应部分后标注 `✅ passed` / `❌ failed` / `⏭️ not_run`（`-review` 复习材料不参与验证，无标注）。
+   - `status` 为 `completed` 的课程，在状态列显示 `⭐ completed（已完结）`。
+6. **metadata 缺失的教程**单独列为一组，逐条标注 *⚠️ metadata 缺失*（附目录位置与发现的 part 文件数），并提示：运行 `/lathe 标签 <slug>` 或任一写入型操作可按 `<SKILL_DIR>/SKILL.md`"metadata.json 自愈"重建索引。
+7. **结尾给出总览一句话**：共几门语言、几门课程、几个部分，多少课程尚未验证，以及多少教程 metadata 缺失（如有）。
+8. **目录为空或不存在时**：告诉用户还没有教程，提示用 `/lathe <主题>` 生成第一个。
 
 ### 带 slug：`/lathe list <slug>` 或 `/lathe 列表 <slug>`
 
-1. **读取** `<TUTORIALS_DIR>/<slug>/metadata.json` 和 `verify-result.json`（如存在）。slug 不存在时列出可用 slug 供用户选择。
+1. **定位并读取。** 按 `<SKILL_DIR>/SKILL.md`"教程位置解析规则"找到该教程目录，读取 `metadata.json` 和 `verify-result.json`（如存在）。slug 不存在时列出 config 中已知的全部 slug 及其位置供用户选择。**metadata 缺失但目录存在时**，按 `<SKILL_DIR>/SKILL.md`"metadata.json 自愈"展示可推断的信息并建议重建。
 2. **展示详细状态**：
-   - 标题、主题、编程语言、创建时间、正文语言、voice、模型；
+   - 标题、主题、编程语言、创建时间、正文语言、voice、模型、所在目录；
    - `parts` 列表（逐个文件名，附各部分的一级标题和逐部分验证结果）；
    - 标签、来源数量；
    - 仓库/分支/本地项目路径/锁定工具版本（如有）；
    - 验证结果：状态、时间，若失败则给出失败的部分、步骤和错误信息。
-3. **给出下一步建议**：根据状态提示可用操作（如 `unverified` → 提示可 `/lathe 验证 <slug>`；上一部分"接下来"有未决问题 → 提示可 `/lathe 续写 <slug>`）。
+3. **给出下一步建议**：根据状态提示可用操作（如 `unverified` → 提示可 `/lathe 验证 <slug>`；上一部分"接下来"有未决问题 → 提示可 `/lathe 续写 <slug>`；久未学习 → 提示可 `/lathe 复习 <slug>`；目标已达成 → 提示可 `/lathe 续写 收尾 <slug>` 完结；`completed` → 说明已完结，续写可重新开放）。
 
 ## 边界
 
-- **不写入任何文件。** 纯展示操作。
+- **不写入任何文件。** 纯展示操作——包括对 metadata 缺失的教程：只标注和建议，重建写入由用户发起其他操作时执行。
 - 不修改 `metadata.json`、`verify-result.json` 或任何部分文件。
 - 展示后保持会话，用户往往接着发起续写/验证等操作。

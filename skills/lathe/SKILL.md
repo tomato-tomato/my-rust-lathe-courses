@@ -14,6 +14,8 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
 ```
 /lathe <主题>                          → 生成新教程
 /lathe 续写|extend <slug> [指导]       → 续写教程下一部分
+/lathe 续写 收尾 <slug>                → 生成总结部分并完结课程
+/lathe 复习|review <slug>              → 生成复习材料（不改变课程方向）
 /lathe 验证|verify <slug>              → 端到端验证教程
 /lathe 提问|ask <slug> <part> <问题>   → 提问教程内容
 /lathe 标签|tag <slug>                 → 管理教程标签
@@ -25,21 +27,38 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
 
 ## 教程存储路径配置
 
-所有教程统一存储在可配置的基础目录下，路径记录在 `~/.lathe/config.json`：
+教程存储位置记录在 `~/.lathe/config.json`，支持**多路径存储**——不同教程可以保存在不同目录：
 
 ```json
 {
-  "tutorials_base_path": "~/others/lathe_tutorials"
+  "tutorials_base_path": "~/others/lathe_tutorials",
+  "tutorial_paths": {
+    "taskr": "~/others/lathe_tutorials",
+    "raft-go": "~/projects/my-tutorials"
+  }
 }
 ```
 
-**每次调用本技能时，首先解析存储路径：**
+| 字段 | 含义 |
+|------|------|
+| `tutorials_base_path` | **默认基础目录**：生成新教程时默认提议的位置；`voices/` 自定义语气目录也始终位于此处 |
+| `tutorial_paths` | **教程 → 位置映射**：每个教程（slug）实际所在的基础目录。可选字段——缺失时等价于所有教程都在 `tutorials_base_path` |
 
-1. 尝试读取 `~/.lathe/config.json`，获取 `tutorials_base_path`。
-2. 如果文件不存在或字段缺失：告诉用户 *"这是首次使用 Lathe。教程默认存储在 `~/others/lathe_tutorials/`，要使用其他位置吗？"*，用户确认后创建 `~/.lathe/` 目录并写入 `config.json`。
-3. 后续操作中用 `<TUTORIALS_DIR>` 代指解析到的路径。
+**每次调用本技能时，首先解析配置：**
 
-> 默认值 `~/others/lathe_tutorials/` 是之前一直使用的位置，已存在的教程都在那里。
+1. 尝试读取 `~/.lathe/config.json`。
+2. **文件不存在时**，询问 *"这是你第一次使用 Lathe，还是之前已经生成过教程？"* 并按回答分支：
+   - **第一次使用：** 维持首次使用流程——询问 *"教程默认存储在 `~/others/lathe_tutorials/`，要使用其他位置吗？"*，确认后创建 `~/.lathe/` 并写入 config（`tutorial_paths` 为空对象）。
+   - **已经使用过：** 请用户提供已有教程的存放位置（可以是一个或多个目录）。依次扫描每个位置：枚举包含 `metadata.json` 或 `part-*.md` 的子目录，逐个验证教程（metadata 缺失或损坏的按下方"metadata.json 自愈"处理）。向用户展示扫描结果（每个位置发现的教程列表）并确认，然后写入 config：`tutorials_base_path` 取教程最多的位置（并列时请用户指定），`tutorial_paths` 逐个记录每个 slug 的位置。完成后继续原本的调用意图。
+3. **文件存在时**：直接读取，不再询问默认目录。
+
+**教程位置解析规则（各操作通用）：**
+
+- **生成新教程：** 每次生成前都询问本课程保存位置（默认提议 `tutorials_base_path`）；保存后将该教程登记到 `tutorial_paths`。
+- **操作已有教程（带 slug）：** 先查 `tutorial_paths[<slug>]`；未登记则回退到 `tutorials_base_path`；该位置也找不到此 slug 时，列出 config 中已知的所有 slug 及其位置供用户选择。
+- 后文中 `<TUTORIALS_DIR>` 指**默认基础目录**（`tutorials_base_path`）；涉及具体教程时，该教程的路径按上述规则解析到其实际所在目录。`voices/` 目录始终位于默认基础目录下。
+
+> 兼容性：仅含 `tutorials_base_path` 的旧 config 继续可用——等价于 `tutorial_paths` 缺失的状态，已有教程无需迁移。
 
 ## 技能目录
 
@@ -53,6 +72,8 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
 |----------|-------------------------|----------|----------|
 | **生成新教程** | 主题描述（无下述关键词时） / topic description | `/lathe 用 Go 构建 Raft` | [references/generate.md](references/generate.md) |
 | **续写教程** | 续写、继续、下一部分 / extend、continue、next、add、part | `/lathe extend raft-go` 或 `/lathe 续写 raft-go` | [references/extend.md](references/extend.md) |
+| **收尾完结** | 续写/extend + 收尾、完结、总结 / finish、wrap up | `/lathe 续写 收尾 raft-go` | [references/extend.md](references/extend.md)（收尾模式） |
+| **复习教程** | 复习、回顾 / review、revise、recap | `/lathe 复习 raft-go` 或 `/lathe review raft-go` | [references/review.md](references/review.md) |
 | **验证教程** | 验证、检查、测试 / verify、check、test、validate | `/lathe verify raft-go` 或 `/lathe 验证 raft-go` | [references/verify.md](references/verify.md) |
 | **提问内容** | 提问、问、问题 / ask、question | `/lathe ask raft-go part-01 why use ring buffer` | [references/ask.md](references/ask.md) |
 | **管理标签** | 标签、打标签 / tag、tags、label | `/lathe tag raft-go` 或 `/lathe 标签 raft-go` | [references/tag.md](references/tag.md) |
@@ -97,13 +118,15 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
 
 ## 共享配置：metadata.json 结构
 
-每个教程的 `<TUTORIALS_DIR>/<slug>/metadata.json` 遵循此结构：
+每个教程目录下的 `metadata.json`（位于该教程实际解析出的位置，见"教程位置解析规则"）遵循此结构：
 
 ```json
 {
+  "_warning": "⚠️ 本文件是该教程的索引文件，请勿删除。误删后 lathe 将无法识别此教程；可运行 /lathe 列表 触发自愈重建。",
   "slug": "<kebab-case 短名称>",
   "title": "<教程标题>",
   "topic": "<用户的原始主题描述>",
+  "goal": "<学习目标：生成时与用户确认；旧教程缺失时由首次续写推断补上>",
   "created": "<ISO 8601 时间戳>",
   "status": "unverified",
   "tags": ["<标签1>", "<标签2>"],
@@ -120,6 +143,32 @@ Lathe 是一套完整的动手实践型教程管理工具，涵盖生成、续�
 ```
 
 > 旧教程的 metadata 可能含有已废弃的 `pending_part` 字段——读取时忽略，写回时不必保留。
+> `_warning` 字段是给用户的防误删提醒，技能读取时忽略其内容；新建或写回 metadata 时保留（旧教程缺少的在下次写回时补上）。JSON 不支持注释，故用此字段承载提醒。
+
+**status 状态机：**
+
+- `unverified` → 生成/续写后的默认状态（新增部分后重置为此值）；
+- `verified` → 验证通过后由 verify 写入；
+- `completed` → 收尾完结（`/lathe 续写 收尾 <slug>`）后写入，表示课程已达成学习目标并体面结束；
+- **`completed` 可被撤销：** 用户对已完结课程再次执行续写（含复习以外的任何新部分写入）时，`status` 重置为 `unverified`——继续学习意味着课程重新开放，"已完结"不再成立。
+
+## 共享配置：metadata.json 自愈
+
+`metadata.json` 是教程的索引，但教程正文（`part-NN.md`）本身携带了重建它所需的全部信息。任何操作发现某教程目录**有 `part-*.md` 但 `metadata.json` 缺失或损坏**（JSON 解析失败）时：
+
+1. **确定部分范围：** 按文件名列出该目录的 `part-NN.md` → `parts` 数组。
+2. **逐字段推断：**
+   - `slug` → 目录名；`title` → part-01 的一级标题；
+   - `language` → 正文实际语言；`tags` → 从标题与正文主题推断 2-5 个（语言/领域/技术）；
+   - `tools` → 从前置条件章节与配置代码块（如 `Cargo.toml`、`go.mod`）推断工具名与版本，无法确定的版本标注 `[!UNVERIFIED]`；
+   - `sources` → 提取各部分 `## 来源` 小节中的 URL（去重）；
+   - `created` → 各部分文件中最早的文件修改时间；
+   - `voice` → 默认 `plainspoken`（正文不可判定）；`status` → `unverified`；
+   - `repo`、`local_project_path` → 正文有线索则填，否则留空。
+3. **确认后写入：** 向用户展示重建结果（明确标注哪些字段为推断值），用户确认后写入 `metadata.json`（含顶部的 `_warning` 字段），并在 `~/.lathe/config.json` 的 `tutorial_paths` 中登记该教程位置。
+4. **只读操作不写入：** `list` 将此类教程标注为 *⚠️ metadata 缺失* 并建议运行修复；`ask` 基于部分文件直接回答并顺带提醒。
+
+用户拒绝重建时，相关写入型操作（续写/验证/打标签）终止并说明原因；不要在没有索引的情况下修改教程文件。
 
 ## 共享配置：教程语言
 

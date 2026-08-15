@@ -8,9 +8,9 @@
 - 通过该 skills 生成的对应课程（`tutorials/`）
 - 相关学习代码的记录（`code/`，submodule）
 
-本仓库中的 skills **初版**通过 Qwen 3.7max 读取 Lathe 中的代码改写生成，后续持续迭代优化：已重构为统一的模块化目录（`skills/lathe/`），支持中英文双语触发、多种内置写作语气与风格标杆体系、教程验证时的版本冲突检测与修复等能力。
+本仓库中的 skills **初版**通过 Qwen 3.7max 读取 Lathe 中的代码改写生成，后续持续迭代优化：已重构为统一的模块化目录（`skills/lathe/`），支持中英文双语触发、多种内置写作语气与风格标杆体系、教程验证时的版本冲突检测与修复、多路径教程存储与 metadata 自愈重建、重要概念从已知知识引申的概念锚定、学习目标管理与课程收尾完结/复习工作流等能力。
 
-**安装使用：** 从本仓库的 GitHub Releases 页面下载最新的 `skills.zip`，解压后复制到 QoderWork 的技能目录即可，详细步骤见 [使用教程](./docs/skills-tutorial.md)。
+**安装使用：** 从本仓库的 GitHub Releases 页面下载最新版本的技能包（`lathe-x.y.z.zip`），解压后将 `lathe/` 目录复制到 QoderWork 的技能目录即可，详细步骤见 [使用教程](./docs/skills-tutorial.md)。
 
 非常感谢 Lathe 这个工具 🙏 ！终于让我找到适合自己的学习 Rust 的方法。
 
@@ -21,7 +21,9 @@
 | 操作 | 命令 | 功能 |
 |------|------|------|
 | 生成教程 | `/lathe <主题>` | 为任意主题生成动手实践型教程的第一部分 |
-| 续写教程 | `/lathe 续写\|extend <slug>` | 为已有教程添加下一部分，可基于本地实际代码进度 |
+| 续写教程 | `/lathe 续写\|extend <slug>` | 为已有教程添加下一部分，可基于本地实际代码进度；新部分含目标达成回顾 |
+| 收尾完结 | `/lathe 续写 收尾 <slug>` | 生成总结部分（全课程回顾、知识图谱、练习方向）并完结课程；续写可重新开放 |
+| 复习教程 | `/lathe 复习\|review <slug>` | 生成复习材料：逐部分回顾、自测题、重跑检查点、可继续深入的方向 |
 | 验证教程 | `/lathe 验证\|verify <slug>` | 临时目录中端到端执行教程，含版本冲突检测与修复 |
 | 提问内容 | `/lathe 提问\|ask <slug> [part] <问题>` | 基于教程具体内容回答问题 |
 | 管理标签 | `/lathe 标签\|tag <slug>` | 管理教程的搜索标签 |
@@ -37,14 +39,14 @@ my-rust-lathe-courses/
 ├── .gitmodules
 ├── LICENSE
 ├── skills/
-│   └── lathe/           ← 统一的模块化技能目录（SKILL.md 入口路由 + 各操作模块）
+│   └── lathe/           ← 统一的模块化技能目录（SKILL.md 入口路由 + references/ 操作模块）
 ├── docs/                ← skills使用文档、rust学习相关文档
 ├── tutorials/           ← skills生成的课程（每门课程一个子目录，含 metadata.json 和分部分的 markdown）
 └── code/
     └── todo-cli-rust/   ← 课程对应代码。submodule，内部有独立的 .git
 ```
 
-[Lathe 技能在QoderWork中的使用教程](./docs/skills-tutorial.md) 
+[Lathe 技能使用教程](./docs/skills-tutorial.md) 
 
 目前整理的一些 [Rust 学习路径](./docs/learn-rust-way.md) 
 
@@ -60,8 +62,8 @@ my-rust-lathe-courses/
 
 对于Rust的学习尝试过看官方的学习文档，结果看不下去。通过 Rustlings学习，总是学完现在的前面的又都忘了。花钱买课程，跟看文档一样还是看学不下去。所以一直想找些能通过做项目来学习Rust的方法，问了各种 AI，就是给你列出一些学习项目，就没一个系统性的东西。
 
-直到前些天逛 [Zeli](https://zeli.app/zh) 遇到了 [Lathe](https://github.com/devenjarvis/lathe) 这个项目（再次感谢编写这个项目的大佬🙏）， 看了这个工具的介绍惊为天人啊😲！感觉这就是我要找的东西。所以又开始问各种AI，这个工具在国内有啥好的使用媒介。
+直到有天逛 [Zeli](https://zeli.app/zh) 遇到了 [Lathe](https://github.com/devenjarvis/lathe) 这个项目（再次感谢编写这个项目的大佬🙏）， 看了这个工具的介绍惊为天人啊😲！感觉这就是我要找的东西。所以又开始问各种AI，这个工具在国内有啥好的使用媒介。
 
-最开始想法是使用 DeepSeek v4（因为便宜😁）相关的agent工具，看看能不能直接结合 Lathe 这个仓库中的使用教程使用。结果就是感觉有点麻烦，就想着能不能把这个提炼成skills来用，问了几个AI得到了肯定答复。然后就是找有免费额度的国内AI工具，选择了 QoderWork。 有免费额度，能用，操作比较方便，能直接查看生成的教程。找 kimi 总结了些 Rust学习项目，然后这样学起来了😄
+最开始想法是使用 DeepSeek v4（因为便宜😁）相关的agent工具，看看能不能直接结合 Lathe 这个仓库中的使用教程使用。结果就是感觉有点麻烦，就想着能不能把这个提炼成skills来用，让AI出了一版。再然后就是找有免费额度的国内AI工具，选择了 QoderWork。 有免费额度，能用，操作比较方便，能直接查看生成的教程。找 kimi 总结了些 Rust学习项目，然后这样学起来了😄
 
-但愿这次自己能坚持学下去吧😤！💪加油
+现在(2026-08-11)的QoderWork已经没有每天打卡的免费额度了，所以学完第一门课程后，后续的课程生成准备转移到 Reasonix 上。毕竟要开始花钱了🤔，所以要开始考虑在skill的使用层面怎样省钱，尽量避免那些可优化的多余消耗。
